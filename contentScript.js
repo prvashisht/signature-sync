@@ -9,7 +9,7 @@ document.addEventListener('focus', function(event) {
       var parsedLISignature = JSON.parse(item.linkedinsignature)
       if (parsedLISignature.enabled) {
         activeElement.value = parsedLISignature.text;
-        setCaretPosition(activeElement, 0);
+        _setCaretPosition(activeElement, 0);
       }
       return;
     });
@@ -24,46 +24,60 @@ document.addEventListener('DOMNodeInserted', function(e) {
         (classList.contains('msg-messaging-form__left-actions') ||
         classList.contains('msg-compose-form__left-actions'))) {
     chrome.storage.local.get(['linkedinsignature'], function(item) {
-      var parsedLISignature = JSON.parse(item.linkedinsignature),
-        sliderChecked = parsedLISignature.enabled ? 'checked' : '',
-        tooltipTextVar = '',
-        tooltipClass = '';
-      var eleToAdd = document.createElement('label');
-      eleToAdd.classList.add('lnkdmsg_switch');
-      if (!parsedLISignature.sliderUsedBefore) {
-        tooltipTextVar = '<span class="lnkdmsg_tooltiptext">This switch toggles the LinkedIn Messages Signatures on/off.<br />Once you use this switch, the tooltip will disappear.</span>';
-        eleToAdd.classList.add('lnkdmsg_tooltip');
-      }
-      eleToAdd.innerHTML = `
-        <input class="lnkdmsg_checkbox" type="checkbox" ${sliderChecked}>
-        <span class="lnkdmsg_slider lnkdmsg_round"></span>
-        ${tooltipTextVar}
-      `;
-      node.appendChild(eleToAdd);
-
-      eleToAdd.addEventListener('click', function(e) {
-        if (!parsedLISignature.sliderUsedBefore) {
-          var li_signTooltips = document.getElementsByClassName('lnkdmsg_tooltip');
-          for (var i = li_signTooltips.length - 1; i >= 0; i--) {
-            li_signTooltips[i].classList.remove('lnkdmsg_tooltip')
-          }
-          var li_signTooltipTexts = document.getElementsByClassName('lnkdmsg_tooltiptext');
-          for (var i = li_signTooltipTexts.length - 1; i >= 0; i--) {
-            li_signTooltipTexts[i].parentNode.removeChild(li_signTooltipTexts[i]);
-          }
+      if (!item.linkedinsignature) {
+        var signdetails = {
+          enabled: true,
+          text: "Regards"
         }
-        changeSignatureEnableState({
-          enabled: e.target.checked,
-          text: parsedLISignature.text,
-          sliderUsedBefore: parsedLISignature.sliderUsedBefore || true
+        chrome.storage.local.set({'linkedinsignature': JSON.stringify(signdetails)}, function() {
+          _doOurLIStuff(node, signdetails)
         });
-      });
-      return;
+      } else {
+        _doOurLIStuff(node, JSON.parse(item.linkedinsignature));
+        return;
+      }
     });
   }
 });
 
-function setCaretPosition(elem, caretPos) {
+function _doOurLIStuff(node, parsedLISignature) {
+  var sliderChecked = parsedLISignature.enabled ? 'checked' : '',
+    tooltipTextVar = '',
+    tooltipClass = '';
+  var eleToAdd = document.createElement('label');
+  eleToAdd.classList.add('lnkdmsg_switch');
+  if (!parsedLISignature.sliderUsedBefore) {
+    tooltipTextVar = '<span class="lnkdmsg_tooltiptext">This switch toggles the LinkedIn Messages Signatures on/off.<br />Once you use this switch, the tooltip will disappear.</span>';
+    eleToAdd.classList.add('lnkdmsg_tooltip');
+  }
+  eleToAdd.innerHTML = `
+    <input class="lnkdmsg_checkbox" type="checkbox" ${sliderChecked}>
+    <span class="lnkdmsg_slider lnkdmsg_round"></span>
+    ${tooltipTextVar}
+  `;
+  node.appendChild(eleToAdd);
+
+  eleToAdd.addEventListener('click', function(e) {
+    if (!parsedLISignature.sliderUsedBefore) {
+      var li_signTooltips = document.getElementsByClassName('lnkdmsg_tooltip');
+      for (var i = li_signTooltips.length - 1; i >= 0; i--) {
+        li_signTooltips[i].classList.remove('lnkdmsg_tooltip')
+      }
+      var li_signTooltipTexts = document.getElementsByClassName('lnkdmsg_tooltiptext');
+      for (var i = li_signTooltipTexts.length - 1; i >= 0; i--) {
+        li_signTooltipTexts[i].parentNode.removeChild(li_signTooltipTexts[i]);
+      }
+    }
+    _changeSignatureEnableState({
+      enabled: e.target.checked,
+      text: parsedLISignature.text,
+      sliderUsedBefore: parsedLISignature.sliderUsedBefore || true
+    });
+  });
+  return;
+}
+
+function _setCaretPosition(elem, caretPos) {
     if(elem != null) {
         if(elem.createTextRange) {
             var range = elem.createTextRange();
@@ -80,7 +94,7 @@ function setCaretPosition(elem, caretPos) {
     }
 }
 
-function changeSignatureEnableState(signdetails) {
+function _changeSignatureEnableState(signdetails) {
   chrome.storage.local.set({'linkedinsignature': JSON.stringify(signdetails)}, function() {
     var li_signcheckboxes = document.getElementsByClassName('lnkdmsg_checkbox');
     for (var i = li_signcheckboxes.length - 1; i >= 0; i--) {
