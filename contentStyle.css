@@ -1,0 +1,99 @@
+/* The switch - the box around the slider */
+.lnkdmsg_switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+  margin: 0;
+  position: relative;
+  top: 30%;
+}
+
+/* Hide default HTML checkbox */
+.lnkdmsg_switch input {display:none;}
+
+/* The slider */
+.lnkdmsg_slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.lnkdmsg_slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .lnkdmsg_slider {
+  background-color: #2196F3;
+}
+
+input:focus + .lnkdmsg_slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .lnkdmsg_slider:before {
+  -webkit-transform: translateX(16px);
+  -ms-transform: translateX(16px);
+  transform: translateX(16px);
+}
+
+/* Rounded sliders */
+.lnkdmsg_slider.lnkdmsg_round {
+  border-radius: 34px;
+}
+
+.lnkdmsg_slider.lnkdmsg_round:before {
+  border-radius: 50%;
+}
+
+/* Tooltip container */
+.lnkdmsg_tooltip {
+    display: inline-block;
+    position: relative;
+}
+
+/* Tooltip text */
+.lnkdmsg_tooltip .lnkdmsg_tooltiptext {
+    background-color: black;
+    border-radius: 6px;
+    bottom: 150%;
+    color: #fff;
+    left: 50%;
+    margin-left: -125px;
+    padding: 5px 0;
+    position: absolute;
+    text-align: center;
+    visibility: hidden;
+    width: 250px;
+    z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.lnkdmsg_tooltip:hover .lnkdmsg_tooltiptext {
+    visibility: visible;
+}
+
+.lnkdmsg_tooltip .lnkdmsg_tooltiptext::after {
+    border-color: black transparent transparent transparent;
+    border-style: solid;
+    border-width: 5px;
+    content: " ";
+    left: 50%;
+    margin-left: -5px;
+    position: absolute;
+    top: 100%; /* At the bottom of the tooltip */
+}
