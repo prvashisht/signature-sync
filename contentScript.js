@@ -21,7 +21,8 @@ document.addEventListener('DOMNodeInserted', function(e) {
     classList = node.classList;
 
   if (classList &&
-        (classList.contains('msg-messaging-form__left-actions') ||
+        (classList.contains('msg-form__left-actions') ||
+        classList.contains('msg-messaging-form__left-actions') ||
         classList.contains('msg-compose-form__left-actions'))) {
     chrome.storage.local.get(['linkedinsignature'], function(item) {
       if (!item.linkedinsignature) {
