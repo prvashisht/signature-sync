@@ -1,11 +1,11 @@
-document.addEventListener('focus', function(event) {
+document.addEventListener('focus', function (event) {
   var activeElement = document.activeElement,
-    isMessageBox = activeElement.getAttribute('name') === 'message' && 
-                   activeElement.classList.contains('ember-text-area') &&
-                   activeElement.tagName.toLowerCase() === 'textarea',
+    isMessageBox = activeElement.getAttribute('name') === 'message' &&
+      activeElement.classList.contains('ember-text-area') &&
+      activeElement.tagName.toLowerCase() === 'textarea',
     messagebox;
   if (isMessageBox && !activeElement.value) {
-    chrome.storage.local.get(['linkedinsignature'], function(item) {
+    chrome.storage.sync.get(['linkedinsignature'], function (item) {
       var parsedLISignature = JSON.parse(item.linkedinsignature)
       if (parsedLISignature.enabled) {
         activeElement.value = parsedLISignature.text;
@@ -16,21 +16,21 @@ document.addEventListener('focus', function(event) {
   }
 }, true);
 
-document.addEventListener('DOMNodeInserted', function(e) {
+document.addEventListener('DOMNodeInserted', function (e) {
   var node = e.target,
     classList = node.classList;
 
   if (classList &&
-        (classList.contains('msg-form__left-actions') ||
-        classList.contains('msg-messaging-form__left-actions') ||
-        classList.contains('msg-compose-form__left-actions'))) {
-    chrome.storage.local.get(['linkedinsignature'], function(item) {
+    (classList.contains('msg-form__left-actions') ||
+      classList.contains('msg-messaging-form__left-actions') ||
+      classList.contains('msg-compose-form__left-actions'))) {
+    chrome.storage.sync.get(['linkedinsignature'], function (item) {
       if (!item.linkedinsignature) {
         var signdetails = {
           enabled: true,
           text: "Regards"
         }
-        chrome.storage.local.set({'linkedinsignature': JSON.stringify(signdetails)}, function() {
+        chrome.storage.sync.set({ 'linkedinsignature': JSON.stringify(signdetails) }, function () {
           _doOurLIStuff(node, signdetails)
         });
       } else {
@@ -41,7 +41,7 @@ document.addEventListener('DOMNodeInserted', function(e) {
   }
 });
 
-function _doOurLIStuff(node, parsedLISignature) {
+function _doOurLIStuff (node, parsedLISignature) {
   var sliderChecked = parsedLISignature.enabled ? 'checked' : '',
     tooltipTextVar = '',
     tooltipClass = '';
@@ -58,7 +58,7 @@ function _doOurLIStuff(node, parsedLISignature) {
   `;
   node.appendChild(eleToAdd);
 
-  eleToAdd.addEventListener('click', function(e) {
+  eleToAdd.addEventListener('click', function (e) {
     if (!parsedLISignature.sliderUsedBefore) {
       var li_signTooltips = document.getElementsByClassName('lnkdmsg_tooltip');
       for (var i = li_signTooltips.length - 1; i >= 0; i--) {
@@ -78,25 +78,25 @@ function _doOurLIStuff(node, parsedLISignature) {
   return;
 }
 
-function _setCaretPosition(elem, caretPos) {
-    if(elem != null) {
-        if(elem.createTextRange) {
-            var range = elem.createTextRange();
-            range.move('character', caretPos);
-            range.select();
-        } else {
-            if (elem.selectionStart) {
-                elem.focus();
-                elem.setSelectionRange(caretPos, caretPos);
-            } else {
-                elem.focus();
-            }
-        }
+function _setCaretPosition (elem, caretPos) {
+  if (elem != null) {
+    if (elem.createTextRange) {
+      var range = elem.createTextRange();
+      range.move('character', caretPos);
+      range.select();
+    } else {
+      if (elem.selectionStart) {
+        elem.focus();
+        elem.setSelectionRange(caretPos, caretPos);
+      } else {
+        elem.focus();
+      }
     }
+  }
 }
 
-function _changeSignatureEnableState(signdetails) {
-  chrome.storage.local.set({'linkedinsignature': JSON.stringify(signdetails)}, function() {
+function _changeSignatureEnableState (signdetails) {
+  chrome.storage.sync.set({ 'linkedinsignature': JSON.stringify(signdetails) }, function () {
     var li_signcheckboxes = document.getElementsByClassName('lnkdmsg_checkbox');
     for (var i = li_signcheckboxes.length - 1; i >= 0; i--) {
       if (signdetails.enabled) {
