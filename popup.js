@@ -1,3 +1,7 @@
+if (typeof browser === "undefined") {
+  var browser = chrome;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   var signatureTextDiv = document.getElementById('signature'),
     signatureEnableBox = document.getElementById('enablesign')

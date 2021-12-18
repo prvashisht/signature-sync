@@ -1,3 +1,7 @@
+if (typeof browser === "undefined") {
+  var browser = chrome;
+}
+
 // Every line should be a paragraph. 
 // Including empty lines which should be a whitespace + break tag inside a paragraph
 const modifySignatureToHTML = signature => {
