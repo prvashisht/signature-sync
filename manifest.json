@@ -1,10 +1,10 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
 
-  "name": "LinkedIn Messages Signatures",
-  "short_name": "LinkedIn Sign",
-  "description": "This extension auto appends a signature to the message you're sending to someone on LinkedIn",
-  "version": "2.0",
+  "name": "Professional Networking Auto Signatures",
+  "short_name": "Auto Message Signnatures",
+  "description": "This extension auto appends a signature to the message you're sending to someone on the most famous professional networking website.",
+  "version": "2.0.1",
   "icons": {
     "16": "icon16.png",
     "32": "icon32.png",
