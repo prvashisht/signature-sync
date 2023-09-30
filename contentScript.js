@@ -1,7 +1,3 @@
-if (typeof browser === "undefined") {
-  var browser = chrome;
-}
-
 // Every line should be a paragraph. 
 // Including empty lines which should be a whitespace + break tag inside a paragraph
 const modifySignatureToHTML = signature => {
@@ -33,7 +29,7 @@ document.addEventListener('focus', function (event) {
     isMessageBox = activeElement.classList.contains('msg-form__contenteditable');
 
   if (isMessageBox && !activeElement.textContent.trim()) {
-    browser.storage.local.get(['linkedinsignature'], function (item) {
+    chrome.storage.local.get(['linkedinsignature'], function (item) {
       if (item.linkedinsignature.enabled) {
         activeElement.innerHTML = modifySignatureToHTML(item.linkedinsignature.text);
         _setCaretPosition(activeElement, 0);
