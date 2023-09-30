@@ -6,6 +6,7 @@ SignatureSync is an open-source browser extension designed to enhance your profe
 
 - **Effortless Signatures:** Set your signatures once, and they will automatically append to your messages.
 - **Total Control:** Enable or disable signatures with a click, adapting your signature presence to match your conversation's tone.
+- **Dark Mode support:** The icon changes color based on your theme for easier visibility.
 - **Flexible Customization:** Edit your signatures directly from the extension, ensuring they are always up-to-date.
 - **Open Source and Transparent:** SignatureSync's source code is publicly available on GitHub, emphasizing our commitment to transparency and your security.
 
