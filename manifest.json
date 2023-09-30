@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
 
-  "name": "SignatureSync: Networking Signatures",
+  "name": "SignatureSync: Pro Signatures",
   "short_name": "SignatureSync",
-  "description": "Elevate your professional networking experience with SignatureSync, an intuitive tool that streamlines your professional messaging signatures effortlessly.",
+  "description": "Simplify your messaging with SignatureSync, the tool that automates your signatures, ensuring a professional touch every time.",
   "version": "3.0.0",
   "icons": {
     "16": "icon16.png",
