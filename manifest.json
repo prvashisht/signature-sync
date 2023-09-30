@@ -1,15 +1,14 @@
 {
   "manifest_version": 3,
 
-  "name": "Professional Networking Auto Signatures",
-  "short_name": "Auto Message Signnatures",
-  "description": "This extension auto appends a signature to the message you're sending to someone on the most famous professional networking website.",
-  "version": "2.1.0",
+  "name": "SignatureSync: Professional Networking Signatures",
+  "short_name": "SignatureSync",
+  "description": "Elevate your professional networking experience with SignatureSync, an intuitive tool that streamlines your professional messaging signatures effortlessly.",
+  "version": "3.0.0",
   "icons": {
     "16": "icon16.png",
     "32": "icon32.png",
     "48": "icon48.png",
-    "96": "icon96.png",
     "128": "icon128.png"
   },
   "action": {
@@ -27,7 +26,7 @@
   "content_scripts": [
     {
       "matches": ["*://*.linkedin.com/*"],
-      "js": ["contentScript.js"]
+      "js": ["content.js"]
     }
   ]
 }
