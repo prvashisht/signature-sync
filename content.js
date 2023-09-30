@@ -39,3 +39,19 @@ document.addEventListener('focus', function (event) {
     });
   }
 }, true);
+
+let darkModeListener = (isDarkMode) => {
+  chrome.runtime.sendMessage({
+    type: "themeChange",
+    mode: isDarkMode.matches ? 'dark' : 'light',
+  });
+
+}
+// MediaQueryList
+const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
+// recommended method for newer browsers: specify event-type as first argument
+darkModePreference.addEventListener("change", darkModeListener);
+// deprecated method for backward compatibility
+darkModePreference.addListener(e => darkModeListener);
+// set icons on initial load
+darkModeListener(darkModePreference);
