@@ -28,10 +28,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!item || !item.linkedinsignature) {
       var linkedinsignature = {
         enabled: true,
-        text: "Regards"
+        text: "\nRegards"
       }
       browser.storage.local.set({ linkedinsignature }, () => {
-        signatureTextDiv.value = "Regards";
+        signatureTextDiv.value = "\nRegards";
         signatureEnableBox.checked = true;
         signatureTextDiv.disabled = true;
       });
