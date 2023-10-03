@@ -1,0 +1,6 @@
+.signatureText #signature {
+    min-width: 200px;
+    min-height: 100px;
+    max-width: 750px;
+    max-height: 500px;
+}
