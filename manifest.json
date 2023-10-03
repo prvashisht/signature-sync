@@ -4,7 +4,7 @@
   "name": "SignatureSync: Pro Signatures",
   "short_name": "SignatureSync",
   "description": "Simplify your messaging with SignatureSync, the tool that automates your signatures, ensuring a professional touch every time.",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "icons": {
     "16": "icons/light/icon16.png",
     "32": "icons/light/icon32.png",
@@ -18,7 +18,7 @@
       "48": "icons/light/icon48.png",
       "128": "icons/light/icon128.png"
     },
-    "default_title" : "Change Signature",
+    "default_title" : "Change/Toggle Signature",
     "default_popup" : "popup.html"
   },
   "permissions": [
