@@ -25,13 +25,19 @@ const _setCaretPosition = (elem, caretPos) => {
 
 // Add signature when message box is focused
 document.addEventListener('focus', function (event) {
-  var activeElement = document.activeElement,
-    isMessageBox = activeElement.classList.contains('msg-form__contenteditable');
+  let activeElement = document.activeElement,
+    isConnectNoteBox = activeElement.matches('textarea.connect-button-send-invite__custom-message'),
+    isMessageBox = activeElement.matches('div.msg-form__contenteditable'),
+    shouldAppendSignature = (isConnectNoteBox || isMessageBox) && !activeElement.textContent.trim();
 
-  if (isMessageBox && !activeElement.textContent.trim()) {
+  if (shouldAppendSignature) {
     chrome.storage.local.get(['linkedinsignature'], function (item) {
       if (item.linkedinsignature.enabled) {
-        activeElement.innerHTML = modifySignatureToHTML(item.linkedinsignature.text);
+        if (isMessageBox) {
+          activeElement.innerHTML = modifySignatureToHTML(item.linkedinsignature.text);
+        } else if (isConnectNoteBox) {
+          activeElement.value = item.linkedinsignature.text;
+        }
         _setCaretPosition(activeElement, 0);
         activeElement.click();
       }
@@ -45,7 +51,6 @@ let darkModeListener = (isDarkMode) => {
     type: "themeChange",
     mode: isDarkMode.matches ? 'dark' : 'light',
   });
-
 }
 // MediaQueryList
 const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
