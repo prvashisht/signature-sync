@@ -4,3 +4,8 @@
     max-width: 750px;
     max-height: 500px;
 }
+
+.enableCheck {
+    margin: 2% 0;
+    margin-left: -2%;
+}

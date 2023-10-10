@@ -3,8 +3,9 @@ if (typeof browser === "undefined") {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  var signatureTextDiv = document.getElementById('signature'),
-    signatureEnableBox = document.getElementById('enablesign')
+  let signatureTextDiv = document.getElementById('signature'),
+    messageSignEnableBox = document.getElementById('enableMessageSign'),
+    connectNoteSignEnableBox = document.getElementById('enableConnectNoteSign');
   signatureTextDiv.disabled = true;
 
   document.getElementById('editSignature').addEventListener('click', function () {
@@ -13,10 +14,12 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   document.getElementById('saveSignature').addEventListener('click', function () {
-    var sign = signatureTextDiv.value,
-      enablesign = signatureEnableBox.checked,
+    let sign = signatureTextDiv.value,
+      enableMessageSign = messageSignEnableBox.checked,
+      enableConnectNoteSign = connectNoteSignEnableBox.checked,
       linkedinsignature = {
-        enabled: enablesign,
+        messageSignEnabled: enableMessageSign,
+        connectNoteSignEnabled: enableConnectNoteSign,
         text: sign
       }
     browser.storage.local.set({ linkedinsignature }, () => {
@@ -26,19 +29,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
   browser.storage.local.get('linkedinsignature', function (item) {
     if (!item || !item.linkedinsignature) {
-      var linkedinsignature = {
-        enabled: true,
+      const defaultState = true;
+      let linkedinsignature = {
+        messageSignEnabled: defaultState,
+        connectNoteSignEnabled: defaultState,
         text: "\nRegards"
       }
       browser.storage.local.set({ linkedinsignature }, () => {
         signatureTextDiv.value = "\nRegards";
-        signatureEnableBox.checked = true;
+        messageSignEnableBox.checked = true;
+        connectNoteSignEnableBox.checked = true;
         signatureTextDiv.disabled = true;
       });
     } else {
-      var signdetails = item.linkedinsignature;
+      let signdetails = item.linkedinsignature;
       signatureTextDiv.value = signdetails.text;
-      signatureEnableBox.checked = signdetails.enabled;
+      messageSignEnableBox.checked = signdetails.messageSignEnabled;
+      connectNoteSignEnableBox.checked = signdetails.connectNoteSignEnabled;
     }
   })
 });

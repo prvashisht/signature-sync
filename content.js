@@ -9,15 +9,13 @@ const modifySignatureToHTML = signature => {
 const _setCaretPosition = (elem, caretPos) => {
   if (elem != null) {
     if (elem.createTextRange) {
-      var range = elem.createTextRange();
+      let range = elem.createTextRange();
       range.move('character', caretPos);
       range.select();
     } else {
+      elem.focus();
       if (elem.selectionStart) {
-        elem.focus();
         elem.setSelectionRange(caretPos, caretPos);
-      } else {
-        elem.focus();
       }
     }
   }
@@ -32,16 +30,14 @@ document.addEventListener('focus', function (event) {
 
   if (shouldAppendSignature) {
     chrome.storage.local.get(['linkedinsignature'], function (item) {
-      if (item.linkedinsignature.enabled) {
-        if (isMessageBox) {
-          activeElement.innerHTML = modifySignatureToHTML(item.linkedinsignature.text);
-        } else if (isConnectNoteBox) {
-          activeElement.value = item.linkedinsignature.text;
-        }
-        _setCaretPosition(activeElement, 0);
-        activeElement.click();
+      if (item.linkedinsignature.messageSignEnabled && isMessageBox) {
+        activeElement.innerHTML = modifySignatureToHTML(item.linkedinsignature.text);
       }
-      return;
+      if (item.linkedinsignature.connectNoteSignEnabled && isConnectNoteBox) {
+        activeElement.value = item.linkedinsignature.text;
+      }
+      _setCaretPosition(activeElement, 0);
+      activeElement.click();
     });
   }
 }, true);
@@ -52,7 +48,6 @@ let darkModeListener = (isDarkMode) => {
     mode: isDarkMode.matches ? 'dark' : 'light',
   });
 }
-// MediaQueryList
 const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
 // recommended method for newer browsers: specify event-type as first argument
 darkModePreference.addEventListener("change", darkModeListener);
