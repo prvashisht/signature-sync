@@ -32,7 +32,7 @@ document.addEventListener('focus', function (event) {
 
   if (shouldAppendSignature) {
     chrome.storage.local.get(['linkedinsignature'], function (item) {
-      if (item.linkedinsignature.enabled) {
+      if (item.linkedinsignature.messageSignEnabled) {
         if (isMessageBox) {
           activeElement.innerHTML = modifySignatureToHTML(item.linkedinsignature.text);
         } else if (isConnectNoteBox) {
