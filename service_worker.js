@@ -28,7 +28,6 @@ chrome.runtime.onInstalled.addListener(installInfo => {
         if (installDate) debugData.installDate = installDate;
         if (updateDate) debugData.updateDate = updateDate;
 
-        console.log(debugData);
         const encodedTechnicalDetails = encodeURIComponent(
             Object.keys(debugData)
             .map(debugKey => `${debugKey}: ${debugData[debugKey]}`)
