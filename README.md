@@ -1,5 +1,7 @@
 # SignatureSync
 
+[![Version](https://img.shields.io/badge/Version-3.2.1-blue.svg)]()
+
 SignatureSync is an open-source browser extension designed to enhance your professional messaging experience. Say goodbye to repetitive typing and hello to effortless conversations. SignatureSync allows you to set your signatures once, automatically appending them to your messages, ensuring a polished and professional touch.
 
 ## Features
