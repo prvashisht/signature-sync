@@ -1,6 +1,7 @@
 # Changelog
 
-- `v3.2.1` - Toggle signatures in connection notes and messages individually
+- `v3.2.1` - Removed unused "tabs" permission
+- `v3.2.0` - Toggle signatures in connection notes and messages individually
 - `v3.1.2` - Append signature to note while adding connection
 - `v3.1.1` - Fixed CSS in the textbox area, made it compatible with Firefox UI
 - `v3.1.0` - Added support for icon change in dark mode
