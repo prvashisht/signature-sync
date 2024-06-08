@@ -25,21 +25,22 @@ const _setCaretPosition = (elem, caretPos) => {
 document.addEventListener('focus', function (event) {
   let activeElement = document.activeElement,
     isConnectNoteBox = activeElement.matches('textarea.connect-button-send-invite__custom-message'),
-    isMessageBox = activeElement.matches('div.msg-form__contenteditable'),
-    shouldAppendSignature = (isConnectNoteBox || isMessageBox) && !activeElement.textContent.trim();
+    isMessageBox = activeElement.matches('div.msg-form__contenteditable');
+  if (!isConnectNoteBox && !isMessageBox) return;
 
-  if (shouldAppendSignature) {
-    chrome.storage.local.get(['linkedinsignature'], function (item) {
-      if (item.linkedinsignature.messageSignEnabled && isMessageBox) {
-        activeElement.innerHTML = modifySignatureToHTML(item.linkedinsignature.text);
-      }
-      if (item.linkedinsignature.connectNoteSignEnabled && isConnectNoteBox) {
-        activeElement.value = item.linkedinsignature.text;
-      }
-      _setCaretPosition(activeElement, 0);
-      activeElement.click();
-    });
-  }
+  let fieldContainsText = isMessageBox ? activeElement.textContent.trim() : activeElement.value.trim();
+  if (fieldContainsText) return;
+
+  chrome.storage.local.get(['linkedinsignature'], function (item) {
+    if (item.linkedinsignature.messageSignEnabled && isMessageBox) {
+      activeElement.innerHTML = modifySignatureToHTML(item.linkedinsignature.text);
+    }
+    if (item.linkedinsignature.connectNoteSignEnabled && isConnectNoteBox) {
+      activeElement.value = item.linkedinsignature.text;
+    }
+    _setCaretPosition(activeElement, 0);
+    activeElement.click();
+  });
 }, true);
 
 let darkModeListener = (isDarkMode) => {
