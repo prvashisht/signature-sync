@@ -28,11 +28,11 @@ chrome.runtime.onInstalled.addListener(installInfo => {
         if (installDate) debugData.installDate = installDate;
         if (updateDate) debugData.updateDate = updateDate;
 
-        const encodedTechnicalDetails = encodeURIComponent(
+        const encodedDebugData = encodeURIComponent(
             Object.keys(debugData)
             .map(debugKey => `${debugKey}: ${debugData[debugKey]}`)
             .join("\n")
         );
-        chrome.runtime.setUninstallURL(`https://docs.google.com/forms/d/e/1FAIpQLSfVQNeGxn0pb6CnG1WRjeWPWjheTa30a7L58g7B7X-x8jaIqg/viewform?usp=pp_url&entry.1303663358=${encodedTechnicalDetails}`);
+        chrome.runtime.setUninstallURL(`https://pratyushvashisht.com/signaturesync/uninstall?utm_source=browser&utm_medium=extension&utm_campaign=uninstall&debugData=${encodedDebugData}`);
     });
 });
