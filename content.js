@@ -109,11 +109,12 @@ const observeNewChat = (chatContainer) => {
 
 const pause = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const waitForChatContainer = async () => {
-  let chatContainer = document.querySelector('aside#msg-overlay.msg-overlay-container');
+  const chatContainerSelector = 'aside#msg-overlay.msg-overlay-container';
+  let chatContainer = document.querySelector(chatContainerSelector);
   let count = 0;
   while (!chatContainer && count < 100) {
     await pause(100);
-    chatContainer = document.querySelector('aside#msg-overlay.msg-overlay-container');
+    chatContainer = document.querySelector(chatContainerSelector);
     count++;
   }
 
