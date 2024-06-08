@@ -71,53 +71,34 @@ const toggleSignature = () => {
   });
 }
 
-const addSignatureToggle = async (newChatBox) => {
+const addSignatureToggle = async (messageActions) => {
+  if (!messageActions) return;
   const signatureToggle = document.createElement('div');
   signatureToggle.classList.add('msg-form__signature-toggle');
-  signatureToggle.style = 'cursor: pointer;';
+  signatureToggle.style = 'cursor: pointer; display: flex; align-items: center; justify-content: center;';
   signatureToggle.title = 'Enable/Disable Signature';
   signatureToggle.addEventListener('click', toggleSignature);
 
   const icon = document.createElement('img');
   icon.src = chrome.runtime.getURL(`icons/${darkModePreference.matches ? 'dark' : 'light'}/icon32.png`);
   icon.alt = 'Toggle Signature';
-  icon.style = 'width: 20px; height: 20px; vertical-align: middle; margin: 0 0.5rem;';
+  icon.style = 'width: 20px; height: 20px; margin: 0 0.5rem; transition: opacity 0.3s; position: relative; bottom: 0.2em;';
   const item = await chrome.storage.local.get(['linkedinsignature']);
   icon.style.opacity = item.linkedinsignature.messageSignEnabled ? 1 : 0.4;
   signatureToggle.appendChild(icon);
 
-  const leftActions = newChatBox.querySelector('.msg-form__left-actions');
-  if (leftActions) {
-    leftActions.appendChild(signatureToggle);
-  }
+  messageActions.appendChild(signatureToggle);
 };
 
-const observeNewChat = (chatContainer) => {
-  const chatObserver = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.type === 'childList') {
-        mutation.addedNodes.forEach((addedNode) => {
-          if (addedNode.nodeType === Node.ELEMENT_NODE && addedNode.matches('div.msg-overlay-conversation-bubble')) {
-            addSignatureToggle(addedNode);
-          }
-        });
-      }
-    });
+const messageForm = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    if (mutation.type === 'childList') {
+      mutation.addedNodes.forEach((addedNode) => {
+        if (addedNode.nodeType === Node.ELEMENT_NODE 
+          && addedNode.matches('.msg-form__footer .msg-form__left-actions')
+        ) addSignatureToggle(addedNode)
+      });
+    }
   });
-  chatObserver.observe(chatContainer, { childList: true, subtree: true });
-};
-
-const pause = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-const waitForChatContainer = async () => {
-  const chatContainerSelector = 'aside#msg-overlay.msg-overlay-container';
-  let chatContainer = document.querySelector(chatContainerSelector);
-  let count = 0;
-  while (!chatContainer && count < 100) {
-    await pause(100);
-    chatContainer = document.querySelector(chatContainerSelector);
-    count++;
-  }
-
-  if (chatContainer) observeNewChat(chatContainer);
-};
-waitForChatContainer();
+});
+messageForm.observe(document.body, { childList: true, subtree: true });

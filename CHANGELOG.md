@@ -1,5 +1,8 @@
 # Changelog
 
+- `v3.3`
+  - Fix: Connection note used to get reset when focus was lost
+  - Feature: Added the extension icon to toggle the signature from the message form itself
 - `v3.2.1` - Removed unused "tabs" permission
 - `v3.2.0` - Toggle signatures in connection notes and messages individually
 - `v3.1.2` - Append signature to note while adding connection
