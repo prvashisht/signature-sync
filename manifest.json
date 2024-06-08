@@ -35,5 +35,11 @@
   ],
   "background": {
     "service_worker": "service_worker.js"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*/icon32.png"],
+      "matches": ["*://*.linkedin.com/*"]
+    }
+  ]
 }
