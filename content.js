@@ -53,7 +53,15 @@ document.addEventListener('focus', async () => {
     activeElement.innerHTML = modifySignatureToHTML(linkedinsignature.messageSignatures[0].text);
   }
   if (linkedinsignature.connectNoteSignEnabled && isConnectNoteBox) {
-    activeElement.value = linkedinsignature.connectionSignatures[0].text;
+    let signatureToAdd = linkedinsignature.connectionSignatures[0].text;
+    const { profileName } = linkedinsignature;
+    if (profileName) {
+      signatureToAdd = signatureToAdd
+        .replace(/__name__/g, profileName.fullName)
+        .replace(/__firstName__/g, profileName.firstName)
+        .replace(/__lastName__/g, profileName.lastName);
+    }
+    activeElement.value = signatureToAdd;
   }
   _setCaretPosition(activeElement, 0);
   activeElement.click();
@@ -87,13 +95,27 @@ const addSignatureToggle = async (messageActions) => {
   messageActions.appendChild(signatureToggle);
 };
 
+const saveProfileName = async (modal) => {
+  if (!modal) return;
+  const fullName = modal.querySelector('strong').textContent.trim();
+  if (!fullName) return;
+  const names = fullName.split(' '),
+    firstName = names[0],
+    lastName = names.slice(1).join(' ');
+  
+  const { linkedinsignature } = await chrome.storage.local.get(['linkedinsignature']);
+  linkedinsignature.profileName = { fullName, firstName, lastName };
+  await chrome.storage.local.set({ linkedinsignature });
+}
+
 const messageForm = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     if (mutation.type === 'childList') {
       mutation.addedNodes.forEach((addedNode) => {
-        if (addedNode.nodeType === Node.ELEMENT_NODE 
-          && addedNode.matches('.msg-form__footer .msg-form__left-actions')
-        ) addSignatureToggle(addedNode)
+        if (addedNode.nodeType === Node.ELEMENT_NODE) {
+          if (addedNode.matches('.msg-form__footer .msg-form__left-actions')) addSignatureToggle(addedNode);
+          if (addedNode.matches('.send-invite .artdeco-modal__content p.display-flex')) saveProfileName(addedNode);
+        }
       });
     }
   });
