@@ -116,6 +116,5 @@
 
 .buttonContainer button:disabled {
     background-color: #a3c3d9;
-    color: #999;
     cursor: not-allowed;
 }

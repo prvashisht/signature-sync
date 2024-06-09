@@ -19,7 +19,7 @@
       "128": "icons/light/icon128.png"
     },
     "default_title" : "Change/Toggle Signature",
-    "default_popup" : "popup.html"
+    "default_popup" : "popup/index.html"
   },
   "permissions": [
     "storage"
