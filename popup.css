@@ -24,13 +24,11 @@
     min-width: 200px;
     outline: 2px solid #0073b1;
     padding: 10px;
-    /* resize: none; */
     transition-duration: 0.3s;
     transition-property: background-color, color, border, outline;
     width: 250px;
 }
 
-/* change outline, border, background, and text color slightly when focused */
 .signatureText #signature:focus {
     background-color: #fff;
     border: 1px solid #005f8d;
@@ -56,6 +54,37 @@
 
 .enableCheck input {
     margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+
+.enableCheck input:checked {
+    background-color: #0073b1;
+    border-color: #0073b1;
+}
+.enableCheck input:checked::before {
+    content: '\2714'; /* Heavy Check Mark */
+    display: block;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.enableCheck input:hover {
+    border-color: #0073b1;
 }
 
 .buttonContainer {
