@@ -5,24 +5,26 @@
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
-    <div class="signatureText">
-      <div>
-        <textarea
-          name="signature"
-          id="signature"
-          cols="25"
-          rows="10"
-          placeholder="Enter your signature here..."
-          disabled
-        ></textarea>
+    <div class="container">
+      <div class="tabs">
+        <button class="tablinks" id="messagesTab">Messages</button>
+        <button class="tablinks" id="connectionsTab">Connections</button>
       </div>
-      <div class="enableCheck">
-        <input type="checkbox" id="enableMessageSign" name="enableMessageSign" />
-        <label for="enableMessageSign">Use in messages</label>
-      </div>
-      <div class="enableCheck">
-        <input type="checkbox" id="enableConnectNoteSign" name="enableConnectNoteSign" />
-        <label for="enableConnectNoteSign">Use in connection requests</label>
+      <div class="tabcontent" id="content">
+        <div class="signatureText">
+          <textarea
+            name="signature"
+            id="signature"
+            cols="25"
+            rows="10"
+            placeholder="Enter your signature here..."
+            disabled
+          ></textarea>
+        </div>
+        <div class="enableCheck">
+          <input type="checkbox" id="enableSign" name="enableSign" />
+          <label for="enableSign">Use in messages</label>
+        </div>
       </div>
       <div class="buttonContainer">
         <button name="save" id="saveSignature">Save</button>

@@ -39,7 +39,7 @@ const _setCaretPosition = (elem, caretPos) => {
 }
 
 // Add signature when message box is focused
-document.addEventListener('focus', function (event) {
+document.addEventListener('focus', async () => {
   let activeElement = document.activeElement,
     isConnectNoteBox = activeElement.matches('textarea.connect-button-send-invite__custom-message'),
     isMessageBox = activeElement.matches('div.msg-form__contenteditable');
@@ -48,26 +48,23 @@ document.addEventListener('focus', function (event) {
   let fieldContainsText = isMessageBox ? activeElement.textContent.trim() : activeElement.value.trim();
   if (fieldContainsText) return;
 
-  chrome.storage.local.get(['linkedinsignature'], function (item) {
-    if (item.linkedinsignature.messageSignEnabled && isMessageBox) {
-      activeElement.innerHTML = modifySignatureToHTML(item.linkedinsignature.text);
-    }
-    if (item.linkedinsignature.connectNoteSignEnabled && isConnectNoteBox) {
-      activeElement.value = item.linkedinsignature.text;
-    }
-    _setCaretPosition(activeElement, 0);
-    activeElement.click();
-  });
+  const { linkedinsignature } = await chrome.storage.local.get(['linkedinsignature']);
+  if (linkedinsignature.messageSignEnabled && isMessageBox) {
+    activeElement.innerHTML = modifySignatureToHTML(linkedinsignature.messageSignatures[0].text);
+  }
+  if (linkedinsignature.connectNoteSignEnabled && isConnectNoteBox) {
+    activeElement.value = linkedinsignature.connectionSignatures[0].text;
+  }
+  _setCaretPosition(activeElement, 0);
+  activeElement.click();
 }, true);
 
-const toggleSignature = () => {
-  chrome.storage.local.get(['linkedinsignature'], function (item) {
-    let linkedinsignature = item.linkedinsignature;
-    linkedinsignature.messageSignEnabled = !linkedinsignature.messageSignEnabled;
-    chrome.storage.local.set({ linkedinsignature });
-    document.querySelectorAll('.msg-form__signature-toggle img').forEach(toggleImg => {
-      toggleImg.style.opacity = linkedinsignature.messageSignEnabled ? 1 : 0.4;
-    });
+const toggleSignature = async () => {
+  const { linkedinsignature } = await chrome.storage.local.get(['linkedinsignature']);
+  linkedinsignature.messageSignEnabled = !linkedinsignature.messageSignEnabled;
+  await chrome.storage.local.set({ linkedinsignature });
+  document.querySelectorAll('.msg-form__signature-toggle img').forEach(toggleImg => {
+    toggleImg.style.opacity = linkedinsignature.messageSignEnabled ? 1 : 0.4;
   });
 }
 
