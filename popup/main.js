@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const defaultSignature = {
     messageSignEnabled: true,
     connectNoteSignEnabled: true,
-
     messageSignatures: [{
       name: "Default",
       text: "\nRegards"
