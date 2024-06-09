@@ -107,9 +107,15 @@
 }
 
 .buttonContainer button:hover {
-    background-color: #005f8d;
+    background-color: #005f8f;
 }
 
 .buttonContainer button:active {
-    background-color: #004c70;
+    background-color: #006a99;
+}
+
+.buttonContainer button:disabled {
+    background-color: #a3c3d9;
+    color: #999;
+    cursor: not-allowed;
 }
