@@ -1,179 +1,248 @@
-body {
-    background-color: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    font-family: 'Montserrat', Arial, sans-serif;
-    margin: 0 auto;
-    padding: 20px;
+:root {
+  --primary-color: #0073b1;
+  --primary-hover-color: #005f8d;
+  --primary-active-color: #006a99;
+  --disabled-color: #a3c3d9;
+  --light-bg-color: #fff;
+  --dark-bg-color: #333;
+  --light-text-color: #333;
+  --dark-text-color: #ddd;
+  --secondary-light-bg-color: #eee;
+  --secondary-light-hover-color: #ddd;
+  --secondary-dark-bg-color: #666;
+  --secondary-dark-hover-color: #555;
+  --input-border-color: #ccc;
+  --input-disabled-bg-color: #f0f0f0;
+  --input-disabled-border-color: #f0f0f0;
+  --input-disabled-text-color: #999;
+  --input-dark-bg-color: #444;
+  --input-dark-border-color: #555;
+  --input-dark-disabled-bg-color: #555;
+  --input-dark-disabled-text-color: #aaa;
 }
 
-.signatureText {
-    width: 100%;
-    height: 100%;
+body {
+  background-color: var(--light-bg-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Montserrat', Arial, sans-serif;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.tabs {
+  display: flex;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.tablinks {
+  background-color: var(--secondary-light-bg-color);
+  border: none;
+  outline: none;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 4px 4px rgba(0, 0, 0, 0.2);
+}
+
+.tablinks:hover {
+  background-color: var(--secondary-light-hover-color);
+}
+
+.tablinks.active {
+  background-color: var(--light-bg-color);
+  cursor: default;
+  box-shadow: none;
+}
+
+.tabcontent {
+  display: block;
+  border-top: none;
 }
 
 .signatureText #signature {
-    background-color: #f7f7f7;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    color: #333;
-    font-family: inherit;
-    font-size: 14px;
-    height: 150px;
-    margin-bottom: 15px;
-    max-height: 400px;
-    max-width: 400px;
-    min-height: 100px;
-    min-width: 200px;
-    outline: 2px solid #0073b1;
-    padding: 10px;
-    transition-duration: 0.3s;
-    transition-property: background-color, color, border, outline;
-    width: 250px;
+  background-color: var(--input-disabled-bg-color);
+  border-radius: 4px;
+  border: 1px solid var(--input-border-color);
+  box-sizing: border-box;
+  color: var(--light-text-color);
+  font-family: inherit;
+  font-size: 14px;
+  height: 150px;
+  margin-bottom: 15px;
+  max-height: 400px;
+  max-width: 400px;
+  min-height: 100px;
+  min-width: 250px;
+  outline: 2px solid var(--primary-color);
+  padding: 10px;
+  transition: background-color 0.3s, color 0.3s, border 0.3s, outline 0.3s;
+  width: 250px;
 }
 
 .signatureText #signature:focus {
-    background-color: #fff;
-    border: 1px solid #005f8d;
-    color: #000;
-    outline: 2px solid #005f8d;
+  background-color: var(--light-bg-color);
+  border: 1px solid var(--primary-hover-color);
+  color: #000;
+  outline: 2px solid var(--primary-hover-color);
 }
 
 .signatureText #signature:disabled {
-    background-color: #f0f0f0;
-    border: 1px solid #f0f0f0;
-    color: #999;
-    cursor: not-allowed;
-    outline: none;
+  background-color: var(--input-disabled-bg-color);
+  border: 1px solid var(--input-disabled-border-color);
+  color: var(--input-disabled-text-color);
+  cursor: not-allowed;
+  outline: none;
 }
 
 .enableCheck {
-    align-items: center;
-    color: #333;
-    display: flex;
-    font-size: 14px;
-    margin-bottom: 15px;
+  align-items: center;
+  color: var(--light-text-color);
+  display: flex;
+  font-size: 14px;
+  margin-bottom: 15px;
 }
 
 .enableCheck input {
-    margin-right: 10px;
-    width: 18px;
-    height: 18px;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    outline: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s, border-color 0.3s;
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: var(--light-bg-color);
+  border: 1px solid var(--input-border-color);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s, border-color 0.3s;
 }
 
 .enableCheck input:checked {
-    background-color: #0073b1;
-    border-color: #0073b1;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .enableCheck input:checked::before {
-    content: '\2714'; /* Heavy Check Mark */
-    display: block;
-    color: #fff;
-    font-size: 14px;
-    line-height: 1;
+  content: '\2714';
+  color: var(--light-bg-color);
+  font-size: 14px;
+  line-height: 1;
 }
 
 .enableCheck input:hover {
-    border-color: #0073b1;
+  border-color: var(--primary-hover-color);
 }
 
 .buttonContainer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 
 .buttonContainer button {
-    background-color: #0073b1;
-    border-radius: 5px;
-    border: none;
-    color: white;
-    cursor: pointer;
-    flex: 1;
-    font-size: 14px;
-    margin: 0 5px;
-    padding: 10px 20px;
-    transition: background-color 0.3s;
+  background-color: var(--primary-color);
+  border-radius: 5px;
+  border: none;
+  color: var(--light-bg-color);
+  cursor: pointer;
+  flex: 1;
+  font-size: 14px;
+  margin: 0 5px;
+  padding: 10px 20px;
+  transition: background-color 0.3s;
 }
 
 .buttonContainer button:hover {
-    background-color: #005f8f;
+  background-color: var(--primary-hover-color);
 }
 
 .buttonContainer button:active {
-    background-color: #006a99;
+  background-color: var(--primary-active-color);
 }
 
 .buttonContainer button:disabled {
-    background-color: #a3c3d9;
-    cursor: not-allowed;
+  background-color: var(--disabled-color);
+  cursor: not-allowed;
 }
 
 @media (prefers-color-scheme: dark) {
-    body {
-        background-color: #333;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
-        color: #eee;
-    }
+  body {
+    background-color: var(--dark-bg-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+    color: var(--dark-text-color);
+  }
 
-    .signatureText #signature {
-        background-color: #444;
-        border: 1px solid #555;
-    }
+  .tablinks {
+    background-color: var(--secondary-dark-bg-color);
+    color: var(--dark-text-color);
+    box-shadow: inset -2px -2px 4px 4px rgba(0, 0, 0, 0.4);
+  }
 
-    .signatureText #signature:focus {
-        background-color: #555;
-        border: 1px solid #0073b1;
-        color: #fff;
-        outline: 2px solid #0073b1;
-    }
+  .tablinks:hover {
+    background-color: var(--secondary-dark-hover-color);
+  }
 
-    .signatureText #signature:disabled {
-        background-color: #555;
-        border: 1px solid #555;
-        color: #aaa;
-    }
+  .tablinks.active {
+    background-color: var(--dark-bg-color);
+  }
 
-    .enableCheck {
-        color: #eee;
-    }
+  .tabcontent {
+    color: var(--dark-text-color);
+  }
 
-    .enableCheck input {
-        background-color: #444;
-        border: 1px solid #555;
-    }
+  .signatureText #signature {
+    background-color: var(--input-dark-bg-color);
+    border: 1px solid var(--input-dark-border-color);
+    color: var(--dark-text-color);
+  }
 
-    .enableCheck input:hover {
-        border-color: #0073b1;
-    }
+  .signatureText #signature:focus {
+    background-color: var(--input-dark-bg-color);
+    border: 1px solid var(--primary-color);
+    color: #fff;
+    outline: 2px solid var(--primary-color);
+  }
 
-    .buttonContainer button {
-        background-color: #005f8f;
-    }
+  .signatureText #signature:disabled {
+    background-color: var(--input-dark-disabled-bg-color);
+    border: 1px solid var(--input-dark-border-color);
+    color: var(--input-dark-disabled-text-color);
+  }
 
-    .buttonContainer button:hover {
-        background-color: #0073b1;
-    }
+  .enableCheck {
+    color: var(--dark-text-color);
+  }
 
-    .buttonContainer button:active {
-        background-color: #006a99;
-    }
+  .enableCheck input {
+    background-color: var(--input-dark-bg-color);
+    border: 1px solid var(--input-dark-border-color);
+  }
 
-    .buttonContainer button:disabled {
-        background-color: #555;
-        color: #777;
-    }
+  .enableCheck input:hover {
+    border-color: var(--primary-color);
+  }
+
+  .buttonContainer button {
+    background-color: var(--primary-hover-color);
+  }
+
+  .buttonContainer button:hover {
+    background-color: var(--primary-color);
+  }
+
+  .buttonContainer button:active {
+    background-color: var(--primary-active-color);
+  }
+
+  .buttonContainer button:disabled {
+    background-color: var(--input-dark-disabled-bg-color);
+    color: var(--input-dark-disabled-text-color);
+  }
 }
