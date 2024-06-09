@@ -1,11 +1,86 @@
+.signatureText {
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #e1e1e1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+    padding: 20px;
+}
+
 .signatureText #signature {
-    min-width: 200px;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    color: #333;
+    font-family: inherit;
+    font-size: 14px;
+    height: 150px;
+    margin-bottom: 15px;
+    max-height: 400px;
+    max-width: 400px;
     min-height: 100px;
-    max-width: 750px;
-    max-height: 500px;
+    min-width: 200px;
+    outline: 2px solid #0073b1;
+    padding: 10px;
+    /* resize: none; */
+    transition-duration: 0.3s;
+    transition-property: background-color, color, border, outline;
+    width: 250px;
+}
+
+/* change outline, border, background, and text color slightly when focused */
+.signatureText #signature:focus {
+    background-color: #fff;
+    border: 1px solid #005f8d;
+    color: #000;
+    outline: 2px solid #005f8d;
+}
+
+.signatureText #signature:disabled {
+    background-color: #f0f0f0;
+    border: 1px solid #f0f0f0;
+    color: #999;
+    cursor: not-allowed;
+    outline: none;
 }
 
 .enableCheck {
-    margin: 2% 0;
-    margin-left: -2%;
+    align-items: center;
+    color: #333;
+    display: flex;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.enableCheck input {
+    margin-right: 10px;
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.buttonContainer button {
+    background-color: #0073b1;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    flex: 1;
+    font-size: 14px;
+    margin: 0 5px;
+    padding: 10px 20px;
+    transition: background-color 0.3s;
+}
+
+.buttonContainer button:hover {
+    background-color: #005f8d;
+}
+
+.buttonContainer button:active {
+    background-color: #004c70;
 }
