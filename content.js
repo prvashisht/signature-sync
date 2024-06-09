@@ -50,10 +50,10 @@ document.addEventListener('focus', async () => {
 
   const { linkedinsignature } = await chrome.storage.local.get(['linkedinsignature']);
   if (linkedinsignature.messageSignEnabled && isMessageBox) {
-    activeElement.innerHTML = modifySignatureToHTML(linkedinsignature.messageText || linkedinsignature.text);
+    activeElement.innerHTML = modifySignatureToHTML(linkedinsignature.messageSignatures[0].text);
   }
   if (linkedinsignature.connectNoteSignEnabled && isConnectNoteBox) {
-    activeElement.value = linkedinsignature.connectionText || linkedinsignature.text;
+    activeElement.value = linkedinsignature.connectionSignatures[0].text;
   }
   _setCaretPosition(activeElement, 0);
   activeElement.click();

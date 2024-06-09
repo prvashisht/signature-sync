@@ -13,8 +13,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const defaultSignature = {
     messageSignEnabled: true,
     connectNoteSignEnabled: true,
-    messageText: "\nRegards",
-    connectionText: "\nRegards"
+
+    messageSignatures: [{
+      name: "Default",
+      text: "\nRegards"
+    }],
+    connectionSignatures: [{
+      name: "Default",
+      text: "\nRegards"
+    }],
   };
 
   let { linkedinsignature: storedSignature } = await browser.storage.local.get('linkedinsignature');
@@ -24,8 +31,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (storedSignature) {
       if (Object.keys(storedSignature).includes('text')) {
         // Old format detected
-        updatedSignature.messageText = storedSignature.text;
-        updatedSignature.connectionText = storedSignature.text;
+        updatedSignature.messageSignatures[0].text = storedSignature.text;
+        updatedSignature.connectionSignatures[0].text = storedSignature.text;
         updatedSignature.messageSignEnabled = storedSignature.messageSignEnabled;
         updatedSignature.connectNoteSignEnabled = storedSignature.connectNoteSignEnabled;
       } else updatedSignature = { ...storedSignature };
@@ -40,18 +47,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const updateSignatureText = () => {
     if (currentTab === 'messages') {
-      signatureText.value = storedSignature.messageText;
+      signatureText.value = storedSignature.messageSignatures[0].text;
       enableSignBox.checked = storedSignature.messageSignEnabled;
     } else {
-      signatureText.value = storedSignature.connectionText;
+      signatureText.value = storedSignature.connectionSignatures[0].text;
       enableSignBox.checked = storedSignature.connectNoteSignEnabled;
     }
   };
 
   const setSaveButtonDisabledState = () => {
     saveButton.disabled = currentTab === 'messages'
-      ? signatureText.value === storedSignature.messageText && enableSignBox.checked === storedSignature.messageSignEnabled
-      : signatureText.value === storedSignature.connectionText && enableSignBox.checked === storedSignature.connectNoteSignEnabled;
+      ? signatureText.value === storedSignature.messageSignatures[0].text && enableSignBox.checked === storedSignature.messageSignEnabled
+      : signatureText.value === storedSignature.connectionSignatures[0].text && enableSignBox.checked === storedSignature.connectNoteSignEnabled;
   };
 
   const setEditButton = (newState) => {
@@ -75,10 +82,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   saveButton.addEventListener('click', async () => {
     if (currentTab === 'messages') {
-      storedSignature.messageText = signatureText.value;
+      storedSignature.messageSignatures[0].text = signatureText.value;
       storedSignature.messageSignEnabled = enableSignBox.checked;
     } else {
-      storedSignature.connectionText = signatureText.value;
+      storedSignature.connectionSignatures[0].text = signatureText.value;
       storedSignature.connectNoteSignEnabled = enableSignBox.checked;
     }
 
