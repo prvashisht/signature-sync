@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Change LinkedIn message signature</title>
-    <link rel="stylesheet" href="popup.css">
+    <link rel="stylesheet" href="./style.css">
   </head>
   <body>
     <div class="signatureText">
@@ -11,7 +11,10 @@
           name="signature"
           id="signature"
           cols="25"
-          rows="10"></textarea>
+          rows="10"
+          placeholder="Enter your signature here..."
+          disabled
+        ></textarea>
       </div>
       <div class="enableCheck">
         <input type="checkbox" id="enableMessageSign" name="enableMessageSign" />
@@ -21,12 +24,11 @@
         <input type="checkbox" id="enableConnectNoteSign" name="enableConnectNoteSign" />
         <label for="enableConnectNoteSign">Use in connection requests</label>
       </div>
-      <div>
+      <div class="buttonContainer">
         <button name="save" id="saveSignature">Save</button>
         <button name="edit" id="editSignature">Edit</button>
       </div>
     </div>
-    <script src="popup.js"></script>
+    <script src="./main.js"></script>
   </body>
 </html>
-
