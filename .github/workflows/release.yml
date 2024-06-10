@@ -33,12 +33,9 @@ jobs:
           ref: firefox
 
       - name: Rebase onto main
-        uses: martincostello/rebaser@v2.0.1
-        id: rebase
-
-      - name: Push changes
-        if : ${{ steps.rebase.outputs.result == 'success' }}
-        run: git push --force-with-lease origin firefox
+        run: |
+          git fetch origin
+          git rebase origin/main || exit 1
 
   update_docs:
     runs-on: ubuntu-latest
