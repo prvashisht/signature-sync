@@ -114,8 +114,6 @@ jobs:
         git checkout firefox
         git rebase main -X theirs
         git push origin origin/firefox --force
-        cat manifest.json
-        cat CHANGELOG.md
 
   create_release:
     runs-on: ubuntu-latest
@@ -133,6 +131,7 @@ jobs:
     
     - name: Zip Firefox extension
       run: |
+        git branch firefox origin/firefox
         git checkout firefox
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ../signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
