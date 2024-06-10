@@ -42,9 +42,10 @@ jobs:
         run: |
           git fetch origin
           git rebase origin/main || {
-            echo "Conflicts detected during rebase:"
-            git diff --diff-filter=U
-            exit 1
+            echo "Conflicts detected. Resolving using incoming changes."
+            git rebase --abort
+            git reset --hard origin/main
+            git merge -X theirs origin/firefox
           }
 
   update_docs:
