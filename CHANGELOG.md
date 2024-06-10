@@ -1,5 +1,9 @@
 # Changelog
 
+- `v4.0`
+  - feat: Update LinkedIn signature with profile name
+  - Allow separate signatures for messages and connection requests
+  - Improved popup UI with multiple changes
 - `v3.4`
   - feat: Update LinkedIn signature with profile name
   - Allow separate signatures for messages and connection requests
