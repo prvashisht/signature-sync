@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-    # paths:
-    #   - 'manifest.json'
+    paths:
+      - 'manifest.json'
 
 jobs:
   check_version:
@@ -104,7 +104,7 @@ jobs:
         # git commit -m "Update README and CHANGELOG for version ${{ needs.check_version.outputs.new_version }}"
         # git push
 
-  build_zips:
+  create_release:
     runs-on: ubuntu-latest
     needs: 
       - check_version
@@ -122,10 +122,11 @@ jobs:
       run: |
         git fetch --all
         git checkout origin/firefox
-        # git rebase -X theirs origin/main # assuming the branch is already up-to-date other than version number
-        # git push origin HEAD -f
+        git rebase -X theirs origin/main # assuming the branch is already up-to-date other than version number
+        git push origin HEAD -f
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ~/signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
+        git checkout main
 
     - name: Upload Chrome zip
       uses: actions/upload-artifact@v4
@@ -138,16 +139,6 @@ jobs:
       with:
         name: signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
         path: ~/signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
-
-  create_release:
-    runs-on: ubuntu-latest
-    needs: 
-      - check_version
-      - update_files
-      - build_zips
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
     
     - name: Print files list
       run: |
