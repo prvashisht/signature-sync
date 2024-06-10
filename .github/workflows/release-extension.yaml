@@ -90,7 +90,7 @@ jobs:
       run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
         FORMATTED_CHANGELOG=$(echo "$CHANGELOG" | sed 's/\\n/\n/g' | sed 's/^/  - /')
-        echo "- \`v${VERSION}\`\n${FORMATTED_CHANGELOG}"\n | sed 's/\\n/\n/g')"
+        echo "- \`v${VERSION}\`\n${FORMATTED_CHANGELOG}"\n | sed 's/\\n/\n/g'"
 
   #   - name: Commit changes
   #     run: |
