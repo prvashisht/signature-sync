@@ -87,6 +87,7 @@ jobs:
         else
           echo "CHANGELOG needs to be updated."
           echo "skip_update=false" >> $GITHUB_ENV
+        fi
 
     - name: Update CHANGELOG
       if: env.skip_update == 'false'
