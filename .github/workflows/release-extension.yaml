@@ -114,7 +114,7 @@ jobs:
     - name: Zip Chromium extension
       run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
-        zip -r ../signature-sync-chrome-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
+        zip -r ~/signature-sync-chrome-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
 
     - name: Zip Firefox extension
       run: |
@@ -122,19 +122,19 @@ jobs:
         git checkout origin/firefox
         VERSION=${{ needs.check_version.outputs.new_version }}
         cat manifest.json
-        zip -r ../signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
+        zip -r ~/signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
 
     - name: Upload Chrome zip
       uses: actions/upload-artifact@v4
       with:
         name: signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
-        path: ../signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
+        path: ~/signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
 
     - name: Upload Firefox zip
       uses: actions/upload-artifact@v4
       with:
         name: signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
-        path: ../signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
+        path: ~/signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
 
   create_release:
     runs-on: ubuntu-latest
@@ -168,7 +168,7 @@ jobs:
   #     uses: actions/upload-release-asset@v1
   #     with:
   #       upload_url: ${{ steps.create_release.outputs.upload_url }}
-  #       asset_path: ../signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
+  #       asset_path: ~/signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
   #       asset_name: signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
   #       asset_content_type: application/zip
 
@@ -176,6 +176,6 @@ jobs:
   #     uses: actions/upload-release-asset@v1
   #     with:
   #       upload_url: ${{ steps.create_release.outputs.upload_url }}
-  #       asset_path: ../signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
+  #       asset_path: ~/signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
   #       asset_name: signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
   #       asset_content_type: application/zip
