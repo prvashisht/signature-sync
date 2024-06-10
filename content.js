@@ -121,7 +121,10 @@ const findCompanyName = (fullName) => {
       const skillSections = result.nextElementSibling.textContent.trim(),
         isSkillCurrentCompany = skillSections.startsWith('Current:');
 
-      if (isSkillCurrentCompany) return skillSections.split(':')[1].split(' at ')[1].trim();
+      if (isSkillCurrentCompany) {
+        returnValue = skillSections.split(':')[1].split(' at ')[1].trim();
+        return;
+      }
 
       const primarySummary = result.querySelector('.entity-result__primary-subtitle').textContent.trim(),
         summaryHasCurrentCompany = primarySummary.includes(' at ');
@@ -139,6 +142,7 @@ const saveProfileDetails = async (modal) => {
   if (!fullName) return;
 
   const companyname = findCompanyName(fullName);
+  console.log('returned company name:', companyname)
 
   const names = fullName.split(' '),
     firstName = names[0],
