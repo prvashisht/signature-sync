@@ -121,19 +121,20 @@ jobs:
         git fetch --all
         git checkout origin/firefox
         VERSION=${{ needs.check_version.outputs.new_version }}
+        cat manifest.json
         zip -r ../signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
 
-    # - name: Upload Chrome zip
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: signature-sync-chrome
-    #     path: ../signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
+    - name: Upload Chrome zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
+        path: ../signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
 
-    # - name: Upload Firefox zip
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: signature-sync-firefox
-    #     path: ../signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
+    - name: Upload Firefox zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
+        path: ../signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
 
   create_release:
     runs-on: ubuntu-latest
@@ -147,9 +148,9 @@ jobs:
     
     - name: Print release log
       run: |
-        echo "Release log:"
         RELEASELOG=$(echo "${{ needs.update_files.outputs.release_log }}" | sed 's/\\n/\n/g')
-        echo "$RELEASELOG"
+        echo "printing files"
+        ls -la ..
 
     # - name: Create GitHub Release
     #   id: create_release
