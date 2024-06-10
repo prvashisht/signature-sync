@@ -118,7 +118,8 @@ jobs:
 
     - name: Zip Firefox extension
       run: |
-        git checkout firefox
+        git fetch all
+        git checkout origin/firefox
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ../signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
 
@@ -134,15 +135,15 @@ jobs:
         name: signature-sync-firefox
         path: ../signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
 
-  # create_release:
-  #   runs-on: ubuntu-latest
-  #   needs: 
-  #     - check_version
-  #     - update_files
-  #     - build_zips
-  #   steps:
-  #   - name: Checkout repository
-  #     uses: actions/checkout@v3
+  create_release:
+    runs-on: ubuntu-latest
+    needs: 
+      - check_version
+      - update_files
+      - build_zips
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
   #   - name: Create GitHub Release
   #     id: create_release
