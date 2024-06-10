@@ -129,7 +129,7 @@ const findCompanyName = (fullName) => {
   }
 };
 
-const saveProfileName = async (modal) => {
+const saveProfileDetails = async (modal) => {
   if (!modal) return;
   const fullName = modal.querySelector('strong').textContent.trim();
   if (!fullName) return;
@@ -152,7 +152,7 @@ const messageForm = new MutationObserver((mutations) => {
       mutation.addedNodes.forEach((addedNode) => {
         if (addedNode.nodeType === Node.ELEMENT_NODE) {
           if (addedNode.matches('.msg-form__footer .msg-form__left-actions')) addSignatureToggle(addedNode);
-          if (addedNode.matches('.send-invite .artdeco-modal__content p.display-flex')) saveProfileName(addedNode);
+          if (addedNode.matches('.send-invite .artdeco-modal__content p.display-flex')) saveProfileDetails(addedNode);
         }
       });
     }
