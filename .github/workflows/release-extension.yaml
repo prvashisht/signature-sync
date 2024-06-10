@@ -16,7 +16,7 @@ jobs:
       old_version: ${{ steps.get_old_version.outputs.version }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -55,7 +55,6 @@ jobs:
           echo "No version update detected or new version is not greater than old version."
           echo "changed=false" >> $GITHUB_ENV
           echo "changed=false" >> $GITHUB_OUTPUT
-          # exit 0
         fi
 
   update_files:
@@ -66,7 +65,7 @@ jobs:
       pr_list: ${{ steps.get_prs.outputs.pr_list }}
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
