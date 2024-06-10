@@ -102,8 +102,8 @@ jobs:
         git config --global user.email 'github-actions@github.com'
         git add README.md CHANGELOG.md
         git diff --staged
-        # git commit -m "Update README and CHANGELOG for version ${{ needs.check_version.outputs.new_version }}"
-        # git push
+        git commit -m "Update README and CHANGELOG for version ${{ needs.check_version.outputs.new_version }}"
+        git push
 
   create_release:
     runs-on: ubuntu-latest
@@ -117,7 +117,7 @@ jobs:
     - name: Zip Chromium extension
       run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
-        zip -r ~/signature-sync-chrome-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
+        zip -r ../signature-sync-chrome-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
 
     - name: Zip Firefox extension
       run: |
@@ -128,27 +128,27 @@ jobs:
         git rebase -X theirs origin/main # assuming the branch is already up-to-date other than version number
         git push origin origin/firefox --force
         VERSION=${{ needs.check_version.outputs.new_version }}
-        zip -r ~/signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
+        zip -r ../signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
         git checkout main
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Upload Chrome zip
-      uses: actions/upload-artifact@v4
-      with:
-        name: signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
-        path: ~/signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
+    # - name: Upload Chrome zip
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
+    #     path: ~/signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
 
-    - name: Upload Firefox zip
-      uses: actions/upload-artifact@v4
-      with:
-        name: signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
-        path: ~/signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
+    # - name: Upload Firefox zip
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
+    #     path: ~/signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
     
     - name: Print files list
       run: |
         echo "printing files"
-        ls -la ~
+        ls -la ..
         echo "done printing files"
 
     - name: Create GitHub Release
@@ -158,5 +158,5 @@ jobs:
         tag_name: v${{ needs.check_version.outputs.new_version }}
         generate_release_notes: true
         files: |
-          ~/signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
-          ~/signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
+          ../signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
+          ../signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
