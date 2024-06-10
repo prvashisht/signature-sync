@@ -103,7 +103,6 @@ jobs:
       if: env.skip_update == 'false'
       run: |
         git add .
-        git diff --staged
         git commit -m "Update README and CHANGELOG for v${{ needs.check_version.outputs.new_version }}"
     
     - name: Create Pull Request
@@ -141,35 +140,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Switch to main branch
+    - name: Zip Chrome extension
       run: |
         git fetch --all
         git checkout main
-    
-    - name: Minify Chrome files (JS and CSS)
-      uses: nizarmah/auto-minify@v3
-      with:
-        overwrite: true
-
-    - name: Zip Chrome extension
-      run: |
-        git diff
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ../signature-sync-chrome-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
     
-    - name: Switch to firefox branch
+    - name: Zip Firefox extension
       run: |
         git checkout . && git clean -fd
         git checkout firefox
-
-    - name: Minify Firefox files (JS and CSS)
-      uses: nizarmah/auto-minify@v3
-      with:
-        overwrite: true
-
-    - name: Zip Firefox extension
-      run: |
-        git diff
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ../signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
 
