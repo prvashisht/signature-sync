@@ -102,10 +102,14 @@ const findCompanyName = (fullName) => {
     if (mainName === fullName) {
       const experiences = document.querySelector('section #experience').parentElement,
         latestCompany = experiences.querySelector('li'),
-        latestCompanyName = latestCompany.querySelector('img').getAttribute('alt').split(' ').slice(0, -1).join(' '),
-        latestTimeline = latestCompany.querySelector('.pvs-entity__caption-wrapper').textContent,
-        isCurrentCompany = !latestTimeline.split(' - ')[1].split(' · ')[0].includes(' ');
+        latestCompanyName = latestCompany.querySelector('img').getAttribute('alt').split(' ').slice(0, -1).join(' ');
+      
+      let latestTimeline = latestCompany.querySelector('.pvs-entity__caption-wrapper').textContent.trim();
+      
+      const changedRoles = latestTimeline.indexOf(' - ') === -1; // displays "Full-time"
+      if (changedRoles) latestTimeline = latestCompany.querySelector('.pvs-entity__sub-components li .pvs-entity__caption-wrapper').textContent.trim();
 
+      const isCurrentCompany = !latestTimeline.split(' - ')[1].split(' · ')[0].includes(' ');
       if (isCurrentCompany) return latestCompanyName;
     }
   } else if (window.location.href.includes('linkedin.com/search/results/')) {

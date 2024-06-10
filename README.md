@@ -1,6 +1,6 @@
 # SignatureSync
 
-[![Version](https://img.shields.io/badge/Version-3.4-blue.svg)]() [![Release Workflow](https://github.com/prvashisht/signature-sync/actions/workflows/release-extension.yaml/badge.svg?branch=main)](https://github.com/prvashisht/signature-sync/actions/workflows/release-extension.yaml)
+[![Version](https://img.shields.io/badge/Version-3.3-blue.svg)]() [![Release Workflow](https://github.com/prvashisht/signature-sync/actions/workflows/release-extension.yaml/badge.svg?branch=main)](https://github.com/prvashisht/signature-sync/actions/workflows/release-extension.yaml)
 
 SignatureSync is an open-source browser extension designed to enhance your professional messaging experience. Say goodbye to repetitive typing and hello to effortless conversations. SignatureSync allows you to set your signatures once, automatically appending them to your messages, ensuring a polished and professional touch.
 
