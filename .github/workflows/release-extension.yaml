@@ -89,9 +89,9 @@ jobs:
       run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
         FORMATTED_CHANGELOG=$(echo "$CHANGELOG" | sed 's/^/  - /')
-        echo "- \`v${VERSION}\`\n$(echo "${FORMATTED_CHANGELOG}") | sed 's/^/  - /' | sed 's/\\n/\n/g'"
+        echo "- \`v${VERSION}\`\n$(echo "${FORMATTED_CHANGELOG}" | sed 's/^/  - /' | sed 's/\\n/\n/g')\n | sed 's/\\n/\n/g')"
         echo "test git diff"
-        echo "$(git diff)"
+        git diff
 
   #   - name: Commit changes
   #     run: |
