@@ -14,7 +14,6 @@ jobs:
     outputs:
       version_changed: ${{ steps.version_changed.outputs.changed }}
       new_version: ${{ steps.get_new_version.outputs.version }}
-      old_version: ${{ steps.get_old_version.outputs.version }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -36,7 +35,6 @@ jobs:
         git checkout $PREV_TAG
         VERSION=$(jq -r '.version' manifest.json)
         echo "OLD_VERSION=$VERSION" >> $GITHUB_ENV
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Print versions
       run: |
@@ -107,10 +105,17 @@ jobs:
     - name: Create Pull Request
       id: create_pr
       uses: peter-evans/create-pull-request@v6
+      with:
+        title: "Update README and CHANGELOG for v${{ needs.check_version.outputs.new_version }}"
+        branch: "update-docs-${{ needs.check_version.outputs.new_version }}"
+        commit-message: "Update README and CHANGELOG for v${{ needs.check_version.outputs.new_version }}"
+        body: "This PR updates the README and CHANGELOG files for the new version v${{ needs.check_version.outputs.new_version }}."
+        labels: documentation, release, github-actions
+        delete-branch: true
 
     - name: Merge Pull Request
       id: merge_pr
-      run: gh pr merge ${{ steps.create_pr.outputs.pull-request-number }}
+      run: gh pr merge "${{ steps.create_pr.outputs.pull-request-number }}"
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
