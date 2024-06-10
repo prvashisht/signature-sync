@@ -83,7 +83,8 @@ jobs:
     - name: Update README
       run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
-        sed -i 's/Version-[0-9]*\.[0-9]*\.?[0-9]*/Version-'${VERSION}'/' README.md
+        sed -E -i.bak 's/Version-[0-9]+\.[0-9]+(\.[0-9]+)?/Version-'${VERSION}'/' README.md
+        rm README.md.bak
         git diff
 
     - name: Update CHANGELOG
