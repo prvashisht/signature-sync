@@ -124,9 +124,9 @@ jobs:
         git config --global user.email "developer@pratyushvashisht.com"
         git config --global user.name "Pratyush Vashisht"
         git fetch --all
-        git checkout origin/firefox
+        git checkout firefox
         git rebase -X theirs origin/main # assuming the branch is already up-to-date other than version number
-        git push origin firefox --force
+        git push origin origin/firefox --force
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ~/signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
         git checkout main
