@@ -109,7 +109,7 @@ jobs:
       - update_files
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Zip Chromium extension
       run: |
@@ -118,7 +118,7 @@ jobs:
 
     - name: Zip Firefox extension
       run: |
-        git fetch all
+        git fetch --all
         git checkout origin/firefox
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ../signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
@@ -143,7 +143,7 @@ jobs:
       - build_zips
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
   #   - name: Create GitHub Release
   #     id: create_release
