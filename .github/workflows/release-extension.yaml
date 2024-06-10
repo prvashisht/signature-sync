@@ -111,11 +111,10 @@ jobs:
         commit-message: "Update README and CHANGELOG for v${{ needs.check_version.outputs.new_version }}"
         body: "This PR updates the README and CHANGELOG files for the new version v${{ needs.check_version.outputs.new_version }}."
         labels: documentation, release, github-actions
-        delete-branch: true
 
     - name: Merge Pull Request
       id: merge_pr
-      run: gh pr merge "${{ steps.create_pr.outputs.pull-request-number }}"
+      run: gh pr merge "${{ steps.create_pr.outputs.pull-request-number }}" --squash --delete-branch
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
