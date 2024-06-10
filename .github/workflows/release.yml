@@ -1,98 +1,93 @@
-name: Release Chrome Extension
+name: Release Workflow
 
 on:
   push:
+    # branches:
+    #   - main
     paths:
       - 'manifest.json'
 
 jobs:
-  release:
+  check_version:
     runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.version_check.outputs.new_version }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Extract Version from Manifest
-        id: get_version
-        run: |
-          VERSION=$(jq -r '.version' manifest.json)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Check for Version Change
+      - name: Extract version from manifest
         id: version_check
         run: |
-          git fetch origin main
-          PREV_VERSION=$(git show origin/main:manifest.json | jq -r '.version')
-          if [ "$PREV_VERSION" == "$VERSION" ]; then
-            echo "Version did not change. Exiting."
-            exit 1
-          fi
+          NEW_VERSION=$(jq -r '.version' manifest.json)
+          echo ::set-output name=new_version::$NEW_VERSION
 
-      - name: Rebase Firefox Branch
-        run: |
-          git fetch origin firefox
-          git checkout firefox
-          git rebase origin/main || { echo 'Rebase failed, canceling action'; exit 1; }
-          git push origin firefox --force
-
-      - name: Update README with New Version Button Image
-        run: |
-          # Assuming button image URL is updated in README
-          sed -i "s/version-[0-9.]*\.png/version-${{ env.VERSION }}.png/g" README.md
-          git add README.md
-          git commit -m "Update README with version ${{ env.VERSION }}"
-
-      - name: Update Changelog
-        run: |
-          LAST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
-          echo -e "## ${{ env.VERSION }}\n\n$(git log ${LAST_TAG}..HEAD --merges --pretty=format:'%h %s')\n\n$(cat CHANGELOG.md)" > CHANGELOG.md
-          git add CHANGELOG.md
-          git commit -m "Update CHANGELOG for version ${{ env.VERSION }}"
-
-      - name: Build and Zip for Chrome
-        run: |
-          mkdir -p build/chrome
-          cp -r manifest.json main.js content.js service_worker.js style.css index.html build/chrome
-          cd build/chrome
-          zip -r ../../signature-sync-chrome-${{ env.VERSION }}.zip . -x '.*' -x '__MACOSX' -x '*.md'
-
-      - name: Build and Zip for Firefox
-        run: |
-          git checkout firefox
-          mkdir -p build/firefox
-          cp -r manifest.json main.js content.js service_worker.js style.css index.html build/firefox
-          cd build/firefox
-          zip -r ../../signature-sync-firefox-${{ env.VERSION }}.zip . -x '.*' -x '__MACOSX' -x '*.md'
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
+  rebase_firefox:
+    runs-on: ubuntu-latest
+    needs: check_version
+    if: ${{ needs.check_version.outputs.new_version != '' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
-          tag_name: v${{ env.VERSION }}
-          release_name: Release v${{ env.VERSION }}
+          ref: firefox
+
+      - name: Rebase onto main
+        run: |
+          git fetch origin
+          git rebase origin/main || exit 1
+
+  update_docs:
+    runs-on: ubuntu-latest
+    needs: rebase_firefox
+    if: ${{ needs.check_version.outputs.new_version != '' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Update README with new version
+        run: |
+          NEW_VERSION=${{ needs.check_version.outputs.new_version }}
+          sed -i "s/version:.*/version: $NEW_VERSION/" README.md
+          git commit -am "Update README for version $NEW_VERSION"
+          git push origin main
+
+      - name: Update CHANGELOG with latest changes
+        run: |
+          NEW_VERSION=${{ needs.check_version.outputs.new_version }}
+          echo "## $NEW_VERSION - $(date +'%Y-%m-%d')" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "### Changes" >> CHANGELOG.md
+          git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"- %s" >> CHANGELOG.md
+          git commit -am "Update CHANGELOG for version $NEW_VERSION"
+          git push origin main
+
+  build_and_release:
+    runs-on: ubuntu-latest
+    needs: [rebase_firefox, update_docs]
+    if: ${{ needs.check_version.outputs.new_version != '' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build release for Chrome
+        run: |
+          mkdir -p release
+          zip -r release/signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip . -x '.*' -x '__MACOSX' -x '*.md'
+
+      - name: Build release for Firefox
+        run: |
+          git checkout firefox
+          mkdir -p release
+          zip -r release/signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip . -x '.*' -x '__MACOSX' -x '*.md'
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.check_version.outputs.new_version }}
+          name: v${{ needs.check_version.outputs.new_version }}
           body: |
             ## Changes in this release
-            $(git log $(git describe --tags --abbrev=0)..HEAD --oneline)
-          draft: false
-          prerelease: false
-
-      - name: Upload Release Assets
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./signature-sync-chrome-${{ env.VERSION }}.zip
-          asset_name: signature-sync-chrome-${{ env.VERSION }}.zip
-          asset_content_type: application/zip
-
-      - name: Upload Release Assets
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./signature-sync-firefox-${{ env.VERSION }}.zip
-          asset_name: signature-sync-firefox-${{ env.VERSION }}.zip
-          asset_content_type: application/zip
+            ${{ steps.update_docs.outputs.changelog }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
