@@ -120,6 +120,8 @@ jobs:
       run: |
         git fetch --all
         git checkout origin/firefox
+        git rebase origin/main
+        git push origin HEAD -f
         VERSION=${{ needs.check_version.outputs.new_version }}
         cat manifest.json
         zip -r ~/signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
@@ -148,9 +150,9 @@ jobs:
     
     - name: Print release log
       run: |
-        RELEASELOG=$(echo "${{ needs.update_files.outputs.release_log }}" | sed 's/\\n/\n/g')
+        # RELEASELOG=$(echo "${{ needs.update_files.outputs.release_log }}" | sed 's/\\n/\n/g')
         echo "printing files"
-        ls -la ..
+        ls -la ~
 
     # - name: Create GitHub Release
     #   id: create_release
