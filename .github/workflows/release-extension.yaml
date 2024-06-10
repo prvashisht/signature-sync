@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'manifest.json'
+      - '.github/workflows/release-extension.yaml'
 
 jobs:
   check_version:
