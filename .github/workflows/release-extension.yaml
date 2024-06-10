@@ -68,12 +68,10 @@ jobs:
       id: get_changes
       run: |
         PREV_TAG=$(git describe --tags --abbrev=0)
-        RELEASELOG=$(git log $PREV_TAG..HEAD --merges --pretty=format:"%h: %b by %aN")
-        CHANGELOG=$(git log $PREV_TAG..HEAD --merges --pretty=format:"%b")
-        echo "$RELEASELOG" > release_log.txt
-        echo "$CHANGELOG" > changelog.txt
-        echo "release_log=$(cat release_log.txt)" >> $GITHUB_OUTPUT
-        echo "CHANGELOG=$(cat changelog.txt)" >> $GITHUB_ENV
+        RELEASELOG=$(git log $PREV_TAG..HEAD --merges --pretty=format:"%h: %b by %aN" | sed ':a;N;$!ba;s/\n/\\n/g')
+        CHANGELOG=$(git log $PREV_TAG..HEAD --merges --pretty=format:"%b" | sed ':a;N;$!ba;s/\n/\\n/g')
+        echo "release_log=${RELEASELOG}" >> $GITHUB_OUTPUT
+        echo "CHANGELOG=${CHANGELOG}" >> $GITHUB_ENV
 
     - name: Debug logs
       run: |
