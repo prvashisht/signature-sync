@@ -83,14 +83,15 @@ jobs:
     - name: Update README
       run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
-        sed -i 's/version-[0-9]*\.[0-9]*\.?[0-9]*/version-'${VERSION}'/' README.md
-        git diff
+        sed -i 's/Version-[0-9]*\.[0-9]*\.?[0-9]*/Version-'${VERSION}'/' README.md
 
     - name: Update CHANGELOG
       run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
         FORMATTED_CHANGELOG=$(echo "$CHANGELOG" | sed 's/\\n/\n/g' | sed 's/^/  - /')
-        echo "- \`v${VERSION}\`\n${FORMATTED_CHANGELOG}\n" | sed 's/\\n/\n/g'
+        NEW_CHANGELOG=$(echo "- \`v${VERSION}\`\n${FORMATTED_CHANGELOG}\n" | sed 's/\\n/\n/g')
+        awk -v new_changelog="$NEW_CHANGELOG" 'NR==3{print new_changelog}1' CHANGELOG.md > tmpfile && mv tmpfile CHANGELOG.md
+        git diff
 
   #   - name: Commit changes
   #     run: |
