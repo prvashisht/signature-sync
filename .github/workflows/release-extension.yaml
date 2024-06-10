@@ -84,14 +84,13 @@ jobs:
       run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
         sed -i 's/version-[0-9]*\.[0-9]*\.[0-9]*/version-'${VERSION}'/' README.md
+        git diff
 
     - name: Update CHANGELOG
       run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
-        FORMATTED_CHANGELOG=$(echo "$CHANGELOG" | sed 's/^/  - /')
-        echo "- \`v${VERSION}\`\n$(echo "${FORMATTED_CHANGELOG}" | sed 's/^/  - /' | sed 's/\\n/\n/g')\n | sed 's/\\n/\n/g')"
-        echo "test git diff"
-        git diff
+        FORMATTED_CHANGELOG=$(echo "$CHANGELOG" | sed 's/\\n/\n/g' | sed 's/^/  - /')
+        echo "- \`v${VERSION}\`\n${FORMATTED_CHANGELOG}"\n | sed 's/\\n/\n/g')"
 
   #   - name: Commit changes
   #     run: |
