@@ -111,6 +111,8 @@ jobs:
     - name: Merge Pull Request
       id: merge_pr
       run: gh pr merge ${{ steps.create_pr.outputs.pull-request-number }}
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   create_release:
     runs-on: ubuntu-latest
