@@ -111,7 +111,6 @@ jobs:
     
     - name: Update firefox branch
       run: |
-        git fetch --all
         git checkout firefox
         git rebase main -X theirs
         git push origin firefox --force
@@ -127,7 +126,6 @@ jobs:
 
     - name: Zip Chromium extension
       run: |
-        git fetch --all
         git checkout main
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ../signature-sync-chrome-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
