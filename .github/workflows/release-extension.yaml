@@ -82,6 +82,13 @@ jobs:
         echo "$PRS" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
+    - name: Debug PR list
+      run: |
+        echo "PR_LIST from environment:"
+        echo "$PR_LIST"
+        echo "PR_LIST from output:"
+        echo "${{ steps.get_prs.outputs.pr_list }}"
+
   #   - name: Update README
   #     run: |
   #       VERSION=${{ needs.check_version.outputs.new_version }}
