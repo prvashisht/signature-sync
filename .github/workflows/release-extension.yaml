@@ -1,0 +1,156 @@
+name: Update Extension and Create Release
+
+on:
+  push:
+    branches:
+      - main
+    # paths:
+    #   - 'manifest.json'
+
+jobs:
+  check_version:
+    runs-on: ubuntu-latest
+    outputs:
+      version_changed: ${{ steps.version_changed.outputs.changed }}
+      new_version: ${{ steps.get_version.outputs.version }}
+      old_version: ${{ steps.get_old_version.outputs.prev_tag }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Read new version from manifest
+      id: get_version
+      run: |
+        VERSION=$(jq -r '.version' manifest.json)
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Get previous release tag
+      id: get_old_version
+      run: |
+        PREV_TAG=$(git describe --tags --abbrev=0)
+        echo "PREV_TAG=$PREV_TAG" >> $GITHUB_ENV
+        echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+
+    - name: Compare versions
+      id: version_changed
+      run: |
+        if [ "${{ steps.get_old_version.outputs.prev_tag }}" == "${{ steps.get_version.outputs.version }}" ]; then
+          echo "changed=false" >> $GITHUB_ENV
+          echo "changed=false" >> $GITHUB_OUTPUT
+        else
+          echo "changed=true" >> $GITHUB_ENV
+          echo "changed=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Print versions
+      run: |
+        echo "Old version: ${{ steps.get_old_version.outputs.prev_tag }}"
+        echo "New version: ${{ steps.get_version.outputs.version }}"
+
+  # update_files:
+  #   runs-on: ubuntu-latest
+  #   needs: check_version
+  #   if: needs.check_version.outputs.version_changed == 'true'
+  #   outputs:
+  #     pr_list: ${{ steps.get_prs.outputs.pr_list }}
+  #   steps:
+  #   - name: Checkout repository
+  #     uses: actions/checkout@v3
+
+  #   - name: Get merged PRs
+  #     id: get_prs
+  #     run: |
+  #       PREV_TAG=${{ needs.check_version.outputs.old_version }}
+  #       PRS=$(git log $PREV_TAG..HEAD --merges --oneline)
+  #       echo "PR_LIST=$PRS" >> $GITHUB_ENV
+  #       echo "pr_list=$PRS" >> $GITHUB_OUTPUT
+
+  #   - name: Update README
+  #     run: |
+  #       VERSION=${{ needs.check_version.outputs.new_version }}
+  #       sed -i 's/version-[0-9]*\.[0-9]*\.[0-9]*/version-'${VERSION}'/' README.md
+
+  #   - name: Update CHANGELOG
+  #     run: |
+  #       PR_LIST=${{ steps.get_prs.outputs.pr_list }}
+  #       VERSION=${{ needs.check_version.outputs.new_version }}
+  #       echo -e "## [${VERSION}] - $(date +'%Y-%m-%d')\n${PR_LIST}\n\n$(cat CHANGELOG.md)" > CHANGELOG.md
+
+  #   - name: Commit changes
+  #     run: |
+  #       git config --global user.name 'github-actions'
+  #       git config --global user.email 'github-actions@github.com'
+  #       git add README.md CHANGELOG.md
+  #       git commit -m "Update README and CHANGELOG for version ${{ needs.check_version.outputs.new_version }}"
+  #       git push
+
+  # build_zips:
+  #   runs-on: ubuntu-latest
+  #   needs: 
+  #     - check_version
+  #     - update_files
+  #   steps:
+  #   - name: Checkout repository
+  #     uses: actions/checkout@v3
+
+  #   - name: Zip Chromium extension
+  #     run: |
+  #       VERSION=${{ needs.check_version.outputs.new_version }}
+  #       zip -r ../signature-sync-chrome-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
+
+  #   - name: Zip Firefox extension
+  #     run: |
+  #       git checkout firefox
+  #       VERSION=${{ needs.check_version.outputs.new_version }}
+  #       zip -r ../signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
+
+  #   - name: Upload Chrome zip
+  #     uses: actions/upload-artifact@v3
+  #     with:
+  #       name: signature-sync-chrome
+  #       path: ../signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
+
+  #   - name: Upload Firefox zip
+  #     uses: actions/upload-artifact@v3
+  #     with:
+  #       name: signature-sync-firefox
+  #       path: ../signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
+
+  # create_release:
+  #   runs-on: ubuntu-latest
+  #   needs: 
+  #     - check_version
+  #     - update_files
+  #     - build_zips
+  #   steps:
+  #   - name: Checkout repository
+  #     uses: actions/checkout@v3
+
+  #   - name: Create GitHub Release
+  #     id: create_release
+  #     uses: softprops/action-gh-release@v1
+  #     with:
+  #       tag_name: v${{ needs.check_version.outputs.new_version }}
+  #       name: Release v${{ needs.check_version.outputs.new_version }}
+  #       body: |
+  #         Changes in this release:
+  #         ${{ needs.update_files.outputs.pr_list }}
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  #   - name: Upload Chrome zip to release
+  #     uses: actions/upload-release-asset@v1
+  #     with:
+  #       upload_url: ${{ steps.create_release.outputs.upload_url }}
+  #       asset_path: ../signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
+  #       asset_name: signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
+  #       asset_content_type: application/zip
+
+  #   - name: Upload Firefox zip to release
+  #     uses: actions/upload-release-asset@v1
+  #     with:
+  #       upload_url: ${{ steps.create_release.outputs.upload_url }}
+  #       asset_path: ../signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
+  #       asset_name: signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
+  #       asset_content_type: application/zip
