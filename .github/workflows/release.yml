@@ -27,30 +27,9 @@ jobs:
           echo "Old Version: $OLD_VERSION"
           echo "New Version: $NEW_VERSION"
 
-  rebase_firefox:
-    runs-on: ubuntu-latest
-    needs: check_version
-    if: ${{ needs.check_version.outputs.new_version != '' }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          ref: firefox
-
-      - name: Rebase onto main
-        id: rebase
-        run: |
-          git fetch origin
-          git rebase origin/main || {
-            echo "Conflicts detected. Resolving using incoming changes."
-            git rebase --abort
-            git reset --hard origin/main
-            git merge -X theirs origin/firefox
-          }
-
   update_docs:
     runs-on: ubuntu-latest
-    needs: rebase_firefox
+    needs: check_version
     if: ${{ needs.check_version.outputs.new_version != '' }}
     steps:
       - name: Checkout repository
@@ -76,7 +55,7 @@ jobs:
 
   build_and_release:
     runs-on: ubuntu-latest
-    needs: [rebase_firefox, update_docs]
+    needs: [check_version, update_docs]
     if: ${{ needs.check_version.outputs.new_version != '' }}
     steps:
       - name: Checkout repository
