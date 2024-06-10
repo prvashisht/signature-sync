@@ -4,6 +4,10 @@
   - feat: Update LinkedIn signature with profile name
   - Allow separate signatures for messages and connection requests
   - Improved popup UI with multiple changes
+- `v3.4`
+  - feat: Update LinkedIn signature with profile name
+  - Allow separate signatures for messages and connection requests
+  - Improved popup UI with multiple changes
 - `v3.3`
   - Fix: Connection note used to get reset when focus was lost
   - Feature: Added the extension icon to toggle the signature from the message form itself
