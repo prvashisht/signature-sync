@@ -121,6 +121,8 @@ jobs:
 
     - name: Zip Firefox extension
       run: |
+        git config --global user.email "developer@pratyushvashisht.com"
+        git config --global user.name "Pratyush Vashisht"
         git fetch --all
         git checkout origin/firefox
         git rebase -X theirs origin/main # assuming the branch is already up-to-date other than version number
