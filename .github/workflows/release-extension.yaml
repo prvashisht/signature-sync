@@ -101,9 +101,21 @@ jobs:
         labels: documentation, github-actions
 
     - name: Merge Pull Request
-      run: gh pr merge "${{ steps.create_pr.outputs.pull-request-number }}" --squash --delete-branch
+      run: |
+        gh pr merge "${{ steps.create_pr.outputs.pull-request-number }}" --squash --delete-branch
+        git fetch --all
+        git checkout main
+        git pull origin main
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Update firefox branch
+      run: |
+        git checkout firefox
+        git rebase main -X theirs
+        git push origin origin/firefox --force
+        cat manifest.json
+        cat CHANGELOG.md
 
   create_release:
     runs-on: ubuntu-latest
@@ -118,22 +130,12 @@ jobs:
       run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ../signature-sync-chrome-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
-
-    - name: Update firefox branch
-      run: |
-        git config --global user.email "developer@pratyushvashisht.com"
-        git config --global user.name "Pratyush Vashisht"
-        git fetch --all
-        git checkout firefox
-        git rebase main -X theirs
-        git push origin origin/firefox --force
     
     - name: Zip Firefox extension
       run: |
+        git checkout firefox
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ../signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
-        git checkout main
-        git pull origin main
 
     - name: Create GitHub Release
       id: create_release
