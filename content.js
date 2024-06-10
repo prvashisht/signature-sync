@@ -53,10 +53,19 @@ document.addEventListener('focus', async () => {
     activeElement.innerHTML = modifySignatureToHTML(linkedinsignature.messageSignatures[0].text);
   }
   if (linkedinsignature.connectNoteSignEnabled && isConnectNoteBox) {
-    activeElement.value = linkedinsignature.connectionSignatures[0].text;
+    let signatureToAdd = linkedinsignature.connectionSignatures[0].text;
+    const { profileDetails } = linkedinsignature;
+    if (profileDetails) {
+      signatureToAdd = signatureToAdd
+        .replace(/__name__/g, profileDetails.fullName)
+        .replace(/__firstName__/g, profileDetails.firstName)
+        .replace(/__lastName__/g, profileDetails.lastName);
+      if (profileDetails.company) signatureToAdd = signatureToAdd.replace(/__company__/g, profileDetails.company);
+    }
+    activeElement.value = signatureToAdd;
   }
   _setCaretPosition(activeElement, 0);
-  activeElement.click();
+  activeElement.dispatchEvent(new Event('input', { bubbles: true }));
 }, true);
 
 const toggleSignature = async () => {
@@ -87,13 +96,64 @@ const addSignatureToggle = async (messageActions) => {
   messageActions.appendChild(signatureToggle);
 };
 
+const findCompanyName = (fullName) => {
+  if (window.location.href.includes('linkedin.com/in/')) {
+    const mainName = document.querySelector('main h1').textContent.trim();
+    if (mainName === fullName) {
+      const experiences = document.querySelector('section #experience').parentElement,
+        latestCompany = experiences.querySelector('li'),
+        latestCompanyName = latestCompany.querySelector('img').getAttribute('alt').split(' ').slice(0, -1).join(' '),
+        latestTimeline = latestCompany.querySelector('.pvs-entity__caption-wrapper').textContent,
+        isCurrentCompany = !latestTimeline.split(' - ')[1].split(' · ')[0].includes(' ');
+
+      if (isCurrentCompany) return latestCompanyName;
+    }
+  } else if (window.location.href.includes('linkedin.com/search/results/')) {
+    let returnValue = null;
+    document.querySelectorAll('div.mb1').forEach(result => {
+      const name = result.querySelector('a > span > span:not(.visually-hidden)').textContent.trim();
+      if (name !== fullName) return;
+
+      const skillSections = result.nextElementSibling.textContent.trim(),
+        isSkillCurrentCompany = skillSections.startsWith('Current:');
+
+      if (isSkillCurrentCompany) return skillSections.split(':')[1].split(' at ')[1].trim();
+
+      const primarySummary = result.querySelector('.entity-result__primary-subtitle').textContent.trim(),
+        summaryHasCurrentCompany = primarySummary.includes(' at ');
+
+      if (summaryHasCurrentCompany) returnValue = primarySummary.split(' at ')[1].split(/[^\w\s]/)[0];
+    });
+
+    return returnValue;
+  }
+};
+
+const saveProfileDetails = async (modal) => {
+  if (!modal) return;
+  const fullName = modal.querySelector('strong').textContent.trim();
+  if (!fullName) return;
+
+  const companyname = findCompanyName(fullName);
+
+  const names = fullName.split(' '),
+    firstName = names[0],
+    lastName = names.slice(1).join(' ');
+  
+  const { linkedinsignature } = await chrome.storage.local.get(['linkedinsignature']);
+  linkedinsignature.profileDetails = { fullName, firstName, lastName };
+  if (companyname) linkedinsignature.profileDetails.company = companyname;
+  await chrome.storage.local.set({ linkedinsignature });
+}
+
 const messageForm = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     if (mutation.type === 'childList') {
       mutation.addedNodes.forEach((addedNode) => {
-        if (addedNode.nodeType === Node.ELEMENT_NODE 
-          && addedNode.matches('.msg-form__footer .msg-form__left-actions')
-        ) addSignatureToggle(addedNode)
+        if (addedNode.nodeType === Node.ELEMENT_NODE) {
+          if (addedNode.matches('.msg-form__footer .msg-form__left-actions')) addSignatureToggle(addedNode);
+          if (addedNode.matches('.send-invite .artdeco-modal__content p.display-flex')) saveProfileDetails(addedNode);
+        }
       });
     }
   });
