@@ -76,7 +76,22 @@ jobs:
         sed -E -i.bak 's/Version-[0-9]+\.[0-9]+(\.[0-9]+)?/Version-'${VERSION}'/' README.md
         rm README.md.bak
 
+    - name: Check CHANGELOG version
+      id: check_changelog_version
+      run: |
+        VERSION=${{ needs.check_version.outputs.new_version }}
+        THIRD_LINE=$(sed -n '3p' CHANGELOG.md)
+        if echo "$THIRD_LINE" | grep -q "v$VERSION"; then
+          echo "CHANGELOG already contains the new version."
+          echo "skip_update=true" >> $GITHUB_ENV
+        else
+          echo "CHANGELOG needs to be updated."
+          echo "skip_update=false" >> $GITHUB_ENV
+        fi
+        exit 1
+
     - name: Update CHANGELOG
+      if: env.skip_update == 'false'
       run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
         FORMATTED_CHANGELOG=$(echo "$CHANGELOG" | sed 's/\\n/\n/g' | sed 's/^/  - /')
@@ -84,10 +99,12 @@ jobs:
         awk -v new_changelog="$NEW_CHANGELOG" 'NR==3{print new_changelog}1' CHANGELOG.md > tmpfile && mv tmpfile CHANGELOG.md
 
     - name: Commit changes
+      if: env.skip_update == 'false'
       run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
-        git add README.md CHANGELOG.md
+        git add .
+        git diff --staged
         git commit -m "Update README and CHANGELOG for v${{ needs.check_version.outputs.new_version }}"
     
     - name: Create Pull Request
