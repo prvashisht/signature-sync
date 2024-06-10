@@ -84,6 +84,7 @@ jobs:
       run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
         sed -i 's/Version-[0-9]*\.[0-9]*\.?[0-9]*/Version-'${VERSION}'/' README.md
+        git diff
 
     - name: Update CHANGELOG
       run: |
@@ -93,13 +94,15 @@ jobs:
         awk -v new_changelog="$NEW_CHANGELOG" 'NR==3{print new_changelog}1' CHANGELOG.md > tmpfile && mv tmpfile CHANGELOG.md
         git diff
 
-  #   - name: Commit changes
-  #     run: |
-  #       git config --global user.name 'github-actions'
-  #       git config --global user.email 'github-actions@github.com'
-  #       git add README.md CHANGELOG.md
-  #       git commit -m "Update README and CHANGELOG for version ${{ needs.check_version.outputs.new_version }}"
-  #       git push
+    - name: Commit changes
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        git diff
+        git add .
+        git diff --staged
+        # git commit -m "Update README and CHANGELOG for version ${{ needs.check_version.outputs.new_version }}"
+        # git push
 
   # build_zips:
   #   runs-on: ubuntu-latest
