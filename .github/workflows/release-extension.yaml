@@ -13,7 +13,6 @@ jobs:
     outputs:
       version_changed: ${{ steps.version_changed.outputs.changed }}
       new_version: ${{ steps.get_new_version.outputs.version }}
-      old_version: ${{ steps.get_old_version.outputs.version }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -35,25 +34,20 @@ jobs:
         git checkout $PREV_TAG
         VERSION=$(jq -r '.version' manifest.json)
         echo "OLD_VERSION=$VERSION" >> $GITHUB_ENV
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Print versions
       run: |
-        echo "Old version: ${{ steps.get_old_version.outputs.version }}"
-        echo "New version: ${{ steps.get_new_version.outputs.version }}"
+        echo "Old version: $OLD_VERSION"
+        echo "New version: $NEW_VERSION"
 
     - name: Compare versions
       id: version_changed
       run: |
-        NEW_VERSION="${{ steps.get_new_version.outputs.version }}"
-        OLD_VERSION="${{ steps.get_old_version.outputs.version }}"
         if [ "$(printf '%s\n' "$NEW_VERSION" "$OLD_VERSION" | sort -V | head -n1)" = "$OLD_VERSION" ] && [ "$NEW_VERSION" != "$OLD_VERSION" ]; then
           echo "Version has been updated from $OLD_VERSION to $NEW_VERSION"
-          echo "changed=true" >> $GITHUB_ENV
           echo "changed=true" >> $GITHUB_OUTPUT
         else
           echo "No version update detected or new version is not greater than old version."
-          echo "changed=false" >> $GITHUB_ENV
           echo "changed=false" >> $GITHUB_OUTPUT
           # exit 0
         fi
@@ -63,31 +57,30 @@ jobs:
     needs: check_version
     # if: needs.check_version.outputs.version_changed == 'true'
     outputs:
-      pr_list: ${{ steps.get_prs.outputs.pr_list }}
+      release_log: ${{ steps.get_changes.outputs.release_log }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - name: Get merged PRs
-      id: get_prs
+    - name: Get changes since last release
+      id: get_changes
       run: |
         PREV_TAG=$(git describe --tags --abbrev=0)
-        PRS=$(git log $PREV_TAG..HEAD --merges --pretty=format:"%h %s" | grep 'Merge pull request')
-        echo "PR_LIST<<EOF" >> $GITHUB_ENV
-        echo "$PRS" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-        echo "pr_list<<EOF" >> $GITHUB_OUTPUT
-        echo "$PRS" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+        RELEASELOG=$(git log $PREV_TAG..HEAD --merges --pretty=format:"%h: %b by %aN")
+        CHANGELOG=$(git log $PREV_TAG..HEAD --merges --pretty=format:"%b")
+        echo "$RELEASELOG" > release_log.txt
+        echo "$CHANGELOG" > changelog.txt
+        echo "release_log=$(cat release_log.txt)" >> $GITHUB_OUTPUT
+        echo "CHANGELOG=$(cat changelog.txt)" >> $GITHUB_ENV
 
-    - name: Debug PR list
+    - name: Debug logs
       run: |
-        echo "PR_LIST from environment:"
-        echo "$PR_LIST"
-        echo "PR_LIST from output:"
-        echo "${{ steps.get_prs.outputs.pr_list }}"
+        echo "Release log:"
+        echo "${{ steps.get_changes.outputs.release_log }}"
+        echo "Changelog:"
+        echo "$CHANGELOG"
 
   #   - name: Update README
   #     run: |
@@ -96,7 +89,7 @@ jobs:
 
   #   - name: Update CHANGELOG
   #     run: |
-  #       PR_LIST=${{ steps.get_prs.outputs.pr_list }}
+  #       PR_LIST=${{ steps.get_changes.outputs.pr_list }}
   #       VERSION=${{ needs.check_version.outputs.new_version }}
   #       echo -e "## [${VERSION}] - $(date +'%Y-%m-%d')\n${PR_LIST}\n\n$(cat CHANGELOG.md)" > CHANGELOG.md
 
