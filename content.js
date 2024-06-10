@@ -142,7 +142,6 @@ const saveProfileDetails = async (modal) => {
   if (!fullName) return;
 
   const companyname = findCompanyName(fullName);
-  console.log('returned company name:', companyname)
 
   const names = fullName.split(' '),
     firstName = names[0],
