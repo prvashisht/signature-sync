@@ -102,8 +102,15 @@ jobs:
         git config --global user.email 'github-actions@github.com'
         git add README.md CHANGELOG.md
         git diff --staged
-        git commit -m "Update README and CHANGELOG for version ${{ needs.check_version.outputs.new_version }}"
-        git push
+        git commit -m "Update README and CHANGELOG for v${{ needs.check_version.outputs.new_version }}"
+    
+    - name: Create Pull Request
+      id: create_pr
+      uses: peter-evans/create-pull-request@v6
+
+    - name: Merge Pull Request
+      id: merge_pr
+      run: gh pr merge ${{ steps.create_pr.outputs.pull-request-number }}
 
   create_release:
     runs-on: ubuntu-latest
