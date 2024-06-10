@@ -43,7 +43,7 @@ jobs:
           git fetch origin
           git rebase origin/main || {
             echo "Conflicts detected during rebase:"
-            git diff --name-only --diff-filter=U
+            git diff --diff-filter=U
             exit 1
           }
 
