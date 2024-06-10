@@ -1,4 +1,4 @@
-name: Update Extension and Create Release
+name: Release Workflow
 
 on:
   push:
