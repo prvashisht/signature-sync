@@ -146,8 +146,10 @@ jobs:
         git fetch --all
         git checkout main
     
-    - name: Minify Chrome files
-      uses: anthonyftwang/minify-action@v1.0.1
+    - name: Minify Chrome files (JS and CSS)
+      uses: nizarmah/auto-minify@v3
+      with:
+        overwrite: true
 
     - name: Zip Chrome extension
       run: |
@@ -160,8 +162,10 @@ jobs:
         git checkout . && git clean -fd
         git checkout firefox
 
-    - name: Minify Firefox files
-      uses: anthonyftwang/minify-action@v1.0.1
+    - name: Minify Firefox files (JS and CSS)
+      uses: nizarmah/auto-minify@v3
+      with:
+        overwrite: true
 
     - name: Zip Firefox extension
       run: |
