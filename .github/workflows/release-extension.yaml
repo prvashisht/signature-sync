@@ -117,6 +117,7 @@ jobs:
         labels: documentation, github-actions
 
     - name: Merge Pull Request
+      if: steps.create_pr.outputs.pull-request-number
       run: |
         gh pr merge "${{ steps.create_pr.outputs.pull-request-number }}" --squash --delete-branch
         git fetch --all
