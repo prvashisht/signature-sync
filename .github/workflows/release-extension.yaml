@@ -131,7 +131,8 @@ jobs:
     
     - name: Zip Firefox extension
       run: |
-        git branch firefox origin/firefox
+        git branch
+        exit 0
         git checkout firefox
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ../signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
