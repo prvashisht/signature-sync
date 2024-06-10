@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       new_version: ${{ steps.version_check.outputs.new_version }}
+      old_version: ${{ steps.version_check.outputs.old_version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -19,8 +20,12 @@ jobs:
       - name: Extract version from manifest
         id: version_check
         run: |
+          OLD_VERSION=$(git show HEAD~1:manifest.json | jq -r '.version' manifest.json)
           NEW_VERSION=$(jq -r '.version' manifest.json)
+          echo ::set-output name=old_version::$OLD_VERSION
           echo ::set-output name=new_version::$NEW_VERSION
+          echo "Old Version: $OLD_VERSION"
+          echo "New Version: $NEW_VERSION"
 
   rebase_firefox:
     runs-on: ubuntu-latest
@@ -33,9 +38,14 @@ jobs:
           ref: firefox
 
       - name: Rebase onto main
+        id: rebase
         run: |
           git fetch origin
-          git rebase origin/main || exit 1
+          git rebase origin/main || {
+            echo "Conflicts detected during rebase:"
+            git diff --name-only --diff-filter=U
+            exit 1
+          }
 
   update_docs:
     runs-on: ubuntu-latest
@@ -48,6 +58,7 @@ jobs:
       - name: Update README with new version
         run: |
           NEW_VERSION=${{ needs.check_version.outputs.new_version }}
+          OLD_VERSION=${{ needs.check_version.outputs.old_version }}
           sed -i "s/version:.*/version: $NEW_VERSION/" README.md
           git commit -am "Update README for version $NEW_VERSION"
           git push origin main
@@ -89,5 +100,7 @@ jobs:
           body: |
             ## Changes in this release
             ${{ steps.update_docs.outputs.changelog }}
+            ## Old Version: ${{ needs.check_version.outputs.old_version }}
+            ## New Version: ${{ needs.check_version.outputs.new_version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
