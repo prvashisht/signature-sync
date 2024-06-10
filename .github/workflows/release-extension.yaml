@@ -123,17 +123,17 @@ jobs:
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ../signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
 
-    - name: Upload Chrome zip
-      uses: actions/upload-artifact@v3
-      with:
-        name: signature-sync-chrome
-        path: ../signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
+    # - name: Upload Chrome zip
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: signature-sync-chrome
+    #     path: ../signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
 
-    - name: Upload Firefox zip
-      uses: actions/upload-artifact@v3
-      with:
-        name: signature-sync-firefox
-        path: ../signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
+    # - name: Upload Firefox zip
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: signature-sync-firefox
+    #     path: ../signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
 
   create_release:
     runs-on: ubuntu-latest
@@ -144,18 +144,24 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+    
+    - name: Print release log
+      run: |
+        echo "Release log:"
+        RELEASELOG=$(echo "${{ needs.update_files.outputs.release_log }}" | sed 's/\\n/\n/g')
+        echo "$RELEASELOG"
 
-  #   - name: Create GitHub Release
-  #     id: create_release
-  #     uses: softprops/action-gh-release@v1
-  #     with:
-  #       tag_name: v${{ needs.check_version.outputs.new_version }}
-  #       name: Release v${{ needs.check_version.outputs.new_version }}
-  #       body: |
-  #         Changes in this release:
-  #         ${{ needs.update_files.outputs.pr_list }}
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Create GitHub Release
+    #   id: create_release
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     tag_name: v${{ needs.check_version.outputs.new_version }}
+    #     name: Release v${{ needs.check_version.outputs.new_version }}
+    #     body: |
+    #       Changes in this release:
+    #       ${{ needs.update_files.outputs.pr_list }}
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   #   - name: Upload Chrome zip to release
   #     uses: actions/upload-release-asset@v1
