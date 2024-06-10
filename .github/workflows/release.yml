@@ -4,8 +4,8 @@ on:
   push:
     # branches:
     #   - main
-    paths:
-      - 'manifest.json'
+    # paths:
+    #   - 'manifest.json'
 
 jobs:
   check_version:
@@ -33,9 +33,12 @@ jobs:
           ref: firefox
 
       - name: Rebase onto main
-        run: |
-          git fetch origin
-          git rebase origin/main || exit 1
+        uses: martincostello/rebaser@v2.0.1
+        id: rebase
+
+      - name: Push changes
+        if : ${{ steps.rebase.outputs.result == 'success' }}
+        run: git push --force-with-lease origin firefox
 
   update_docs:
     runs-on: ubuntu-latest
