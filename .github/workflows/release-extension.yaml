@@ -66,6 +66,8 @@ jobs:
     - name: Get changes since last release
       id: get_changes
       run: |
+        git config --global user.name 'Pratyush Vashisht'
+        git config --global user.email 'developer@pratyushvashisht.com'
         PREV_TAG=$(git describe --tags --abbrev=0)
         CHANGELOG=$(git log $PREV_TAG..HEAD --merges --pretty=format:"%b" | sed ':a;N;$!ba;s/\n/\\n/g')
         echo "CHANGELOG=${CHANGELOG}" >> $GITHUB_ENV
@@ -100,8 +102,6 @@ jobs:
     - name: Commit changes
       if: env.skip_update == 'false'
       run: |
-        git config --global user.name 'github-actions'
-        git config --global user.email 'github-actions@github.com'
         git add .
         git diff --staged
         git commit -m "Update README and CHANGELOG for v${{ needs.check_version.outputs.new_version }}"
