@@ -17,6 +17,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
     - name: Read new version from manifest
       id: get_new_version
@@ -25,7 +27,7 @@ jobs:
         echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
         echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-    - name: Get previous release tag
+    - name: Get old version from last release's manifest
       id: get_old_version
       run: |
         PREV_TAG=$(git describe --tags --abbrev=0)
