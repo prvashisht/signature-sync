@@ -57,8 +57,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: check_version
     if: needs.check_version.outputs.version_changed == 'true'
-    outputs:
-      release_log: ${{ steps.get_changes.outputs.release_log }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -69,17 +67,8 @@ jobs:
       id: get_changes
       run: |
         PREV_TAG=$(git describe --tags --abbrev=0)
-        RELEASELOG=$(git log $PREV_TAG..HEAD --merges --pretty=format:"%h: %b by %aN" | sed ':a;N;$!ba;s/\n/\\n/g')
         CHANGELOG=$(git log $PREV_TAG..HEAD --merges --pretty=format:"%b" | sed ':a;N;$!ba;s/\n/\\n/g')
-        echo "release_log=${RELEASELOG}" >> $GITHUB_OUTPUT
         echo "CHANGELOG=${CHANGELOG}" >> $GITHUB_ENV
-
-    - name: Debug logs
-      run: |
-        echo "Release log:"
-        echo "${{ steps.get_changes.outputs.release_log }}"
-        echo "Changelog:"
-        echo "$CHANGELOG"
 
     - name: Update README
       run: |
@@ -99,7 +88,6 @@ jobs:
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
         git add README.md CHANGELOG.md
-        git diff --staged
         git commit -m "Update README and CHANGELOG for v${{ needs.check_version.outputs.new_version }}"
     
     - name: Create Pull Request
@@ -110,10 +98,9 @@ jobs:
         branch: "update-docs-${{ needs.check_version.outputs.new_version }}"
         commit-message: "Update README and CHANGELOG for v${{ needs.check_version.outputs.new_version }}"
         body: "This PR updates the README and CHANGELOG files for the new version v${{ needs.check_version.outputs.new_version }}."
-        labels: documentation, release, github-actions
+        labels: documentation, github-actions
 
     - name: Merge Pull Request
-      id: merge_pr
       run: gh pr merge "${{ steps.create_pr.outputs.pull-request-number }}" --squash --delete-branch
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -132,37 +119,21 @@ jobs:
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ../signature-sync-chrome-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
 
-    - name: Zip Firefox extension
+    - name: Update firefox branch
       run: |
         git config --global user.email "developer@pratyushvashisht.com"
         git config --global user.name "Pratyush Vashisht"
         git fetch --all
         git checkout firefox
-        git rebase -X theirs origin/main # assuming the branch is already up-to-date other than version number
+        git rebase main -X theirs
         git push origin origin/firefox --force
+    
+    - name: Zip Firefox extension
+      run: |
         VERSION=${{ needs.check_version.outputs.new_version }}
         zip -r ../signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
         git checkout main
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    # - name: Upload Chrome zip
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
-    #     path: ~/signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
-
-    # - name: Upload Firefox zip
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
-    #     path: ~/signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
-    
-    - name: Print files list
-      run: |
-        echo "printing files"
-        ls -la ..
-        echo "done printing files"
+        git pull origin main
 
     - name: Create GitHub Release
       id: create_release
