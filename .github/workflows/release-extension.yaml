@@ -13,6 +13,7 @@ jobs:
     outputs:
       version_changed: ${{ steps.version_changed.outputs.changed }}
       new_version: ${{ steps.get_new_version.outputs.version }}
+      old_version: ${{ steps.get_old_version.outputs.version }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -34,6 +35,7 @@ jobs:
         git checkout $PREV_TAG
         VERSION=$(jq -r '.version' manifest.json)
         echo "OLD_VERSION=$VERSION" >> $GITHUB_ENV
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Print versions
       run: |
@@ -120,10 +122,9 @@ jobs:
       run: |
         git fetch --all
         git checkout origin/firefox
-        git rebase origin/main
-        git push origin HEAD -f
+        # git rebase -X theirs origin/main # assuming the branch is already up-to-date other than version number
+        # git push origin HEAD -f
         VERSION=${{ needs.check_version.outputs.new_version }}
-        cat manifest.json
         zip -r ~/signature-sync-firefox-${VERSION}.zip . -x '.*' -x '__MACOSX' -x '*.md'
 
     - name: Upload Chrome zip
@@ -148,36 +149,22 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
     
-    - name: Print release log
+    - name: Print files list
       run: |
-        # RELEASELOG=$(echo "${{ needs.update_files.outputs.release_log }}" | sed 's/\\n/\n/g')
         echo "printing files"
         ls -la ~
+        echo "done printing files"
 
-    # - name: Create GitHub Release
-    #   id: create_release
-    #   uses: softprops/action-gh-release@v1
-    #   with:
-    #     tag_name: v${{ needs.check_version.outputs.new_version }}
-    #     name: Release v${{ needs.check_version.outputs.new_version }}
-    #     body: |
-    #       Changes in this release:
-    #       ${{ needs.update_files.outputs.pr_list }}
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create GitHub Release
+      id: create_release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ needs.check_version.outputs.new_version }}
+        body: |
+          ## What's Changed
+          $(echo "${{ needs.update_files.outputs.release_log }}" | sed 's/\\n/\n/g')
 
-  #   - name: Upload Chrome zip to release
-  #     uses: actions/upload-release-asset@v1
-  #     with:
-  #       upload_url: ${{ steps.create_release.outputs.upload_url }}
-  #       asset_path: ~/signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
-  #       asset_name: signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
-  #       asset_content_type: application/zip
-
-  #   - name: Upload Firefox zip to release
-  #     uses: actions/upload-release-asset@v1
-  #     with:
-  #       upload_url: ${{ steps.create_release.outputs.upload_url }}
-  #       asset_path: ~/signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
-  #       asset_name: signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
-  #       asset_content_type: application/zip
+          **Full Changelog**: https://github.com/prvashisht/signature-sync/compare/v${{ needs.check_version.outputs.old_version }}...v${{ needs.check_version.outputs.new_version }}
+        files: |
+          ~/signature-sync-chrome-${{ needs.check_version.outputs.new_version }}.zip
+          ~/signature-sync-firefox-${{ needs.check_version.outputs.new_version }}.zip
