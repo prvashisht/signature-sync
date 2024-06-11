@@ -144,17 +144,18 @@ const findCompanyName = (fullName) => {
 
     const experienceTitleSelector = 'div.mr1 span[aria-hidden="true"]',
       experienceSubtitleSelector = 'span.t-14:not(.t-black--light):first-of-type span[aria-hidden="true"]',
+      experienceTimeLineSelector = '.pvs-entity__sub-components li .pvs-entity__caption-wrapper',
       latestCompany = document.querySelector('section #experience').parentElement.querySelector('li'),
-      changedRoles = latestCompany.querySelector('.pvs-entity__caption-wrapper').textContent.trim().indexOf(' · ') === -1,
+      changedRoles = Boolean(latestCompany.querySelector(experienceTimeLineSelector)),
       latestCompanyName = changedRoles ?
         latestCompany.querySelector(experienceTitleSelector).textContent.trim() :
         latestCompany.querySelector(experienceSubtitleSelector).textContent.trim().split(' · ')[0],
       latestTimeline = changedRoles ?
-        latestCompany.querySelector('.pvs-entity__sub-components li .pvs-entity__caption-wrapper').textContent.trim() :
+        latestCompany.querySelector(experienceTimeLineSelector).textContent.trim() :
         latestCompany.querySelector('.pvs-entity__caption-wrapper').textContent.trim(),
       isCurrentCompany = !latestTimeline.split(' - ')[1].split(' · ')[0].includes(' ');
 
-    return isCurrentCompany ? latestCompanyName : null;
+    return isCurrentCompany ? latestCompanyName.replace(/\s+/, ' ') : null;
   } else if (window.location.href.includes('linkedin.com/search/results/')) {
     let returnValue = null;
     document.querySelectorAll('div.mb1').forEach(result => {
