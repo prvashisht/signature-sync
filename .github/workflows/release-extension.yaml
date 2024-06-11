@@ -8,6 +8,9 @@ on:
       - 'manifest.json'
       - '.github/workflows/release-extension.yaml'
 
+# TODO: Run the workflow without repo changing actions on workflow file change
+# TODO: Upload the release artifacts to respective browser stores via API
+
 jobs:
   check_version:
     runs-on: ubuntu-latest
