@@ -1,5 +1,7 @@
 # Changelog
 
+- `v4.0.2`
+  - fix: Add signature right after sending
 - `v4.0.1`
   - fix: Improved getCompanyName function and stored localStorage data on install
 - `v4.0`
