@@ -1,71 +1,109 @@
-let darkModeListener = (isDarkMode) => {
-  chrome.runtime.sendMessage({
-    type: "themeChange",
-    mode: isDarkMode.matches ? 'dark' : 'light',
-  });
+const darkModeListener = (isDarkMode) => {
+  const mode = isDarkMode.matches ? 'dark' : 'light';
+  chrome.runtime.sendMessage({ type: "themeChange", mode });
   document.querySelectorAll('.msg-form__signature-toggle img').forEach(toggleImg => {
-    toggleImg.src = chrome.runtime.getURL(`icons/${isDarkMode.matches ? 'dark' : 'light'}/icon32.png`);
+    toggleImg.src = chrome.runtime.getURL(`icons/${mode}/icon32.png`);
   });
 }
 const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
-// recommended method for newer browsers: specify event-type as first argument
 darkModePreference.addEventListener("change", darkModeListener);
-// deprecated method for backward compatibility
-darkModePreference.addListener(e => darkModeListener);
-// set icons on initial load
 darkModeListener(darkModePreference);
 
 // Every line should be a paragraph. 
 // Including empty lines which should be a whitespace + break tag inside a paragraph
 const modifySignatureToHTML = signature => {
-  return "<p> <br/></p>" + signature.split('\n').map(signPart => {
-    return `<p>${signPart || " <br/>"}</p>`
-  }).join(" ")
+  return signature ? signature.split('\n')
+    .map(signPart => `<p>${signPart || " <br/>"}</p>`)
+    .join(" ") : "<p> <br/></p>";
 }
 
 const _setCaretPosition = (elem, caretPos) => {
-  if (elem != null) {
-    if (elem.createTextRange) {
-      let range = elem.createTextRange();
-      range.move('character', caretPos);
-      range.select();
-    } else {
-      elem.focus();
-      if (elem.selectionStart) {
-        elem.setSelectionRange(caretPos, caretPos);
-      }
+  if (!elem) return;
+  if (elem.createTextRange) {
+    const range = elem.createTextRange();
+    range.move('character', caretPos);
+    range.select();
+  } else {
+    elem.focus();
+    if (elem.selectionStart) {
+      elem.setSelectionRange(caretPos, caretPos);
     }
   }
 }
 
-// Add signature when message box is focused
-document.addEventListener('focus', async () => {
-  let activeElement = document.activeElement,
+const replaceProfileVariables = (signature, profileDetails) => {
+  if (!profileDetails) return signature;
+
+  const replacementHash = {
+    '__name__': 'fullName',
+    '__firstName__': 'firstName',
+    '__lastName__': 'lastName',
+    '__company__': 'company'
+  };
+  return Object.entries(replacementHash).reduce((acc, [key, value]) => {
+    const profileValue = profileDetails[value];
+    return profileValue ? acc.replace(new RegExp(key, 'g'), profileValue) : acc;
+  }, signature);
+}
+
+const handleSignatureAddition = async (element, isMessageBox) => {
+  const { linkedinsignature } = await chrome.storage.local.get(['linkedinsignature']);
+  if (!linkedinsignature) return;
+
+  const signature = isMessageBox ? linkedinsignature.messageSignatures[0] : linkedinsignature.connectionSignatures[0];
+  if (!signature) return;
+
+  const { profileDetails, messageSignEnabled, connectNoteSignEnabled } = linkedinsignature;
+  const signatureText = replaceProfileVariables(signature.text, profileDetails);
+  let signatureAdded = false;
+  if (messageSignEnabled && isMessageBox) {
+    element.innerHTML = modifySignatureToHTML(signatureText);
+    signatureAdded = true;
+  } else if (connectNoteSignEnabled && !isMessageBox) {
+    element.value = signatureText;
+    signatureAdded = true;
+  }
+  chrome.storage.local.set({ linkedinsignature: { ...linkedinsignature, profileDetails: {} } });
+
+  if (!signatureAdded) return;
+  _setCaretPosition(element, 0);
+  element.dispatchEvent(new Event('input', { bubbles: true }));
+};
+
+const addSignatureObserver = (messageBox) => {
+  const observer = new MutationObserver(async (mutations) => {
+    for (const mutation of mutations) {
+      if ((mutation.type === 'childList' || mutation.type === 'characterData') && !messageBox.textContent.trim()) {
+        await handleSignatureAddition(messageBox, true);
+      }
+    }
+  });
+
+  observer.observe(messageBox, { childList: true, characterData: true, subtree: true });
+  messageBox.signatureObserver = observer;
+};
+
+const removeSignatureObserver = (messageBox) => {
+  messageBox.signatureObserver?.disconnect();
+  delete messageBox.signatureObserver;
+};
+
+const checkFocusedElement = async () => {
+  const activeElement = document.activeElement,
     isConnectNoteBox = activeElement.matches('textarea.connect-button-send-invite__custom-message'),
     isMessageBox = activeElement.matches('div.msg-form__contenteditable');
   if (!isConnectNoteBox && !isMessageBox) return;
+  if (isMessageBox) addSignatureObserver(activeElement);
 
-  let fieldContainsText = isMessageBox ? activeElement.textContent.trim() : activeElement.value.trim();
-  if (fieldContainsText) return;
+  const fieldContainsText = (isMessageBox ? activeElement.textContent : activeElement.value).trim();
+  if (!fieldContainsText) await handleSignatureAddition(activeElement, isMessageBox);
+}
 
-  const { linkedinsignature } = await chrome.storage.local.get(['linkedinsignature']);
-  if (linkedinsignature.messageSignEnabled && isMessageBox) {
-    activeElement.innerHTML = modifySignatureToHTML(linkedinsignature.messageSignatures[0].text);
-  }
-  if (linkedinsignature.connectNoteSignEnabled && isConnectNoteBox) {
-    let signatureToAdd = linkedinsignature.connectionSignatures[0].text;
-    const { profileDetails } = linkedinsignature;
-    if (profileDetails) {
-      signatureToAdd = signatureToAdd
-        .replace(/__name__/g, profileDetails.fullName)
-        .replace(/__firstName__/g, profileDetails.firstName)
-        .replace(/__lastName__/g, profileDetails.lastName);
-      if (profileDetails.company) signatureToAdd = signatureToAdd.replace(/__company__/g, profileDetails.company);
-    }
-    activeElement.value = signatureToAdd;
-  }
-  _setCaretPosition(activeElement, 0);
-  activeElement.dispatchEvent(new Event('input', { bubbles: true }));
+document.addEventListener('focus', checkFocusedElement, true);
+
+document.addEventListener('blur', (event) => {
+  const isMessageBox = event.target.matches('div.msg-form__contenteditable');
+  if (isMessageBox) removeSignatureObserver(event.target);
 }, true);
 
 const toggleSignature = async () => {
@@ -79,6 +117,10 @@ const toggleSignature = async () => {
 
 const addSignatureToggle = async (messageActions) => {
   if (!messageActions) return;
+
+  const { linkedinsignature } = await chrome.storage.local.get(['linkedinsignature']);
+  if (!linkedinsignature) return;
+
   const signatureToggle = document.createElement('div');
   signatureToggle.classList.add('msg-form__signature-toggle');
   signatureToggle.style = 'cursor: pointer; display: flex; align-items: center; justify-content: center;';
@@ -89,11 +131,9 @@ const addSignatureToggle = async (messageActions) => {
   icon.src = chrome.runtime.getURL(`icons/${darkModePreference.matches ? 'dark' : 'light'}/icon32.png`);
   icon.alt = 'Toggle Signature';
   icon.style = 'width: 20px; height: 20px; margin: 0 0.5rem; transition: opacity 0.3s; position: relative; bottom: 0.2em;';
-  const { linkedinsignature } = await chrome.storage.local.get(['linkedinsignature']);
-  if (!linkedinsignature) return;
   icon.style.opacity = linkedinsignature.messageSignEnabled ? 1 : 0.4;
-  signatureToggle.appendChild(icon);
 
+  signatureToggle.appendChild(icon);
   messageActions.appendChild(signatureToggle);
 };
 
@@ -104,17 +144,18 @@ const findCompanyName = (fullName) => {
 
     const experienceTitleSelector = 'div.mr1 span[aria-hidden="true"]',
       experienceSubtitleSelector = 'span.t-14:not(.t-black--light):first-of-type span[aria-hidden="true"]',
+      experienceTimeLineSelector = '.pvs-entity__sub-components li .pvs-entity__caption-wrapper',
       latestCompany = document.querySelector('section #experience').parentElement.querySelector('li'),
-      changedRoles = latestCompany.querySelector('.pvs-entity__caption-wrapper').textContent.trim().indexOf(' · ') === -1,
+      changedRoles = Boolean(latestCompany.querySelector(experienceTimeLineSelector)),
       latestCompanyName = changedRoles ?
         latestCompany.querySelector(experienceTitleSelector).textContent.trim() :
         latestCompany.querySelector(experienceSubtitleSelector).textContent.trim().split(' · ')[0],
       latestTimeline = changedRoles ?
-        latestCompany.querySelector('.pvs-entity__sub-components li .pvs-entity__caption-wrapper').textContent.trim() :
+        latestCompany.querySelector(experienceTimeLineSelector).textContent.trim() :
         latestCompany.querySelector('.pvs-entity__caption-wrapper').textContent.trim(),
       isCurrentCompany = !latestTimeline.split(' - ')[1].split(' · ')[0].includes(' ');
 
-    if (isCurrentCompany) return latestCompanyName;
+    return isCurrentCompany ? latestCompanyName.replace(/\s+/, ' ') : null;
   } else if (window.location.href.includes('linkedin.com/search/results/')) {
     let returnValue = null;
     document.querySelectorAll('div.mb1').forEach(result => {
