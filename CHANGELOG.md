@@ -1,5 +1,7 @@
 # Changelog
 
+- `v4.0.1`
+  - fix: Improved getCompanyName function and stored localStorage data on install
 - `v4.0`
   - Fix getting company name for different scenarios
   - feat: Update LinkedIn signature with profile name
