@@ -1,3 +1,7 @@
+if (typeof browser === "undefined") {
+    var browser = chrome;
+}
+  
 chrome.runtime.onMessage.addListener((request) => {
     if (request.type === "themeChange") {
         let icon_paths = {
@@ -10,6 +14,19 @@ chrome.runtime.onMessage.addListener((request) => {
     }
 });
 
+// TODO: move to a common file and import
+const defaultSignature = {
+    messageSignEnabled: true,
+    connectNoteSignEnabled: true,
+    messageSignatures: [{
+        name: "Default",
+        text: "\nRegards"
+    }],
+    connectionSignatures: [{
+        name: "Default",
+        text: "\nRegards"
+    }],
+};
 chrome.runtime.onInstalled.addListener(installInfo => {
     let installDate, updateDate;
     if (installInfo.reason === "install") {
@@ -17,7 +34,7 @@ chrome.runtime.onInstalled.addListener(installInfo => {
     } else {
         updateDate = new Date().toISOString();
     }
-    chrome.runtime.getPlatformInfo(platformInfo => {
+    chrome.runtime.getPlatformInfo(async platformInfo => {
         let debugData = {
             ...platformInfo,
             agent: navigator.userAgent,
@@ -34,5 +51,7 @@ chrome.runtime.onInstalled.addListener(installInfo => {
             .join("\n")
         );
         chrome.runtime.setUninstallURL(`https://pratyushvashisht.com/signaturesync/uninstall?utm_source=browser&utm_medium=extension&utm_campaign=uninstall&debugData=${encodedDebugData}`);
+
+        await browser.storage.local.set({ linkedinsignature: defaultSignature });
     });
 });
