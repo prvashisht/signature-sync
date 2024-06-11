@@ -12,16 +12,15 @@ darkModeListener(darkModePreference);
 // Every line should be a paragraph. 
 // Including empty lines which should be a whitespace + break tag inside a paragraph
 const modifySignatureToHTML = signature => {
-  if (!signature) return "<p> <br/></p>"
-  return signature.split('\n').map(signPart => {
-    return `<p>${signPart || " <br/>"}</p>`
-  }).join(" ")
+  return signature ? signature.split('\n')
+    .map(signPart => `<p>${signPart || " <br/>"}</p>`)
+    .join(" ") : "<p> <br/></p>";
 }
 
 const _setCaretPosition = (elem, caretPos) => {
   if (!elem) return;
   if (elem.createTextRange) {
-    let range = elem.createTextRange();
+    const range = elem.createTextRange();
     range.move('character', caretPos);
     range.select();
   } else {
@@ -41,29 +40,41 @@ const replaceProfileVariables = (signature, profileDetails) => {
     '__lastName__': 'lastName',
     '__company__': 'company'
   };
-  return Object.keys(replacementHash).reduce((acc, key) => {
-    const value = profileDetails[replacementHash[key]];
-    return value ? acc.replace(new RegExp(key, 'g'), value) : acc;
+  return Object.entries(replacementHash).reduce((acc, [key, value]) => {
+    const profileValue = profileDetails[value];
+    return profileValue ? acc.replace(new RegExp(key, 'g'), profileValue) : acc;
   }, signature);
 }
+
+const handleSignatureAddition = async (element, isMessageBox) => {
+  const { linkedinsignature } = await chrome.storage.local.get(['linkedinsignature']);
+  if (!linkedinsignature) return;
+
+  const signature = isMessageBox ? linkedinsignature.messageSignatures[0] : linkedinsignature.connectionSignatures[0];
+  if (!signature) return;
+
+  const { profileDetails, messageSignEnabled, connectNoteSignEnabled } = linkedinsignature;
+  const signatureText = replaceProfileVariables(signature.text, profileDetails);
+  let signatureAdded = false;
+  if (messageSignEnabled && isMessageBox) {
+    element.innerHTML = modifySignatureToHTML(signatureText);
+    signatureAdded = true;
+  } else if (connectNoteSignEnabled && !isMessageBox) {
+    element.value = signatureText;
+    signatureAdded = true;
+  }
+  chrome.storage.local.set({ linkedinsignature: { ...linkedinsignature, profileDetails: {} } });
+
+  if (!signatureAdded) return;
+  _setCaretPosition(element, 0);
+  element.dispatchEvent(new Event('input', { bubbles: true }));
+};
 
 const addSignatureObserver = (messageBox) => {
   const observer = new MutationObserver(async (mutations) => {
     for (const mutation of mutations) {
-      if (mutation.type === 'childList' || mutation.type === 'characterData') {
-        const fieldContainsText = messageBox.textContent.trim();
-        if (fieldContainsText) return;
-
-        const { linkedinsignature } = await chrome.storage.local.get(['linkedinsignature']);
-        const { profileDetails } = linkedinsignature;
-        // TODO: Combine the code with the other function
-        if (linkedinsignature.messageSignEnabled) {
-          const signatureToAdd = replaceProfileVariables(linkedinsignature.messageSignatures[0].text, profileDetails);
-          messageBox.innerHTML = modifySignatureToHTML(signatureToAdd);
-          _setCaretPosition(messageBox, 0);
-          messageBox.dispatchEvent(new Event('input', { bubbles: true }));
-          chrome.storage.local.set({ linkedinsignature: { ...linkedinsignature, profileDetails: {} } });
-        }
+      if ((mutation.type === 'childList' || mutation.type === 'characterData') && !messageBox.textContent.trim()) {
+        await handleSignatureAddition(messageBox, true);
       }
     }
   });
@@ -73,43 +84,22 @@ const addSignatureObserver = (messageBox) => {
 };
 
 const removeSignatureObserver = (messageBox) => {
-  if (messageBox.signatureObserver) {
-    messageBox.signatureObserver.disconnect();
-    delete messageBox.signatureObserver;
-  }
+  messageBox.signatureObserver?.disconnect();
+  delete messageBox.signatureObserver;
 };
 
-// Add signature when message box is focused
-document.addEventListener('focus', async () => {
+const checkFocusedElement = async () => {
   const activeElement = document.activeElement,
     isConnectNoteBox = activeElement.matches('textarea.connect-button-send-invite__custom-message'),
     isMessageBox = activeElement.matches('div.msg-form__contenteditable');
   if (!isConnectNoteBox && !isMessageBox) return;
   if (isMessageBox) addSignatureObserver(activeElement);
 
-  let fieldContainsText = (isMessageBox ? activeElement.textContent : activeElement.value).trim();
-  if (fieldContainsText) return;
+  const fieldContainsText = (isMessageBox ? activeElement.textContent : activeElement.value).trim();
+  if (!fieldContainsText) await handleSignatureAddition(activeElement, isMessageBox);
+}
 
-  const { linkedinsignature } = await chrome.storage.local.get(['linkedinsignature']);
-  const { profileDetails } = linkedinsignature;
-
-  const addSignature = (signature, isMessageBox) => {
-    const signatureText = replaceProfileVariables(signature.text, profileDetails);
-    if (isMessageBox) {
-      activeElement.innerHTML = modifySignatureToHTML(signatureText);
-    } else {
-      activeElement.value = signatureText;
-    }
-    chrome.storage.local.set({ linkedinsignature: { ...linkedinsignature, profileDetails: {} } });
-  };
-  if (linkedinsignature.messageSignEnabled && isMessageBox) {
-    addSignature(linkedinsignature.messageSignatures[0], true);
-  } else if (linkedinsignature.connectNoteSignEnabled && isConnectNoteBox) {
-    addSignature(linkedinsignature.connectionSignatures[0], false);
-  }
-  _setCaretPosition(activeElement, 0);
-  activeElement.dispatchEvent(new Event('input', { bubbles: true }));
-}, true);
+document.addEventListener('focus', checkFocusedElement, true);
 
 document.addEventListener('blur', (event) => {
   const isMessageBox = event.target.matches('div.msg-form__contenteditable');
