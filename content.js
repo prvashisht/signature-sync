@@ -104,8 +104,7 @@ const findCompanyName = (fullName) => {
 
     const experienceTitleSelector = 'div.mr1 span[aria-hidden="true"]',
       experienceSubtitleSelector = 'span.t-14:not(.t-black--light):first-of-type span[aria-hidden="true"]',
-      experiences = document.querySelector('section #experience').parentElement,
-      latestCompany = experiences.querySelector('li'),
+      latestCompany = document.querySelector('section #experience').parentElement.querySelector('li'),
       changedRoles = latestCompany.querySelector('.pvs-entity__caption-wrapper').textContent.trim().indexOf(' · ') === -1,
       latestCompanyName = changedRoles ?
         latestCompany.querySelector(experienceTitleSelector).textContent.trim() :
