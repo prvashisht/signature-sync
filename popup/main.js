@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     messagesTab = document.getElementById('messagesTab'),
     connectionsTab = document.getElementById('connectionsTab');
 
+  // TODO: move to a common file and import
   const defaultSignature = {
     messageSignEnabled: true,
     connectNoteSignEnabled: true,
