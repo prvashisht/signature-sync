@@ -1,6 +1,11 @@
 {
-  "manifest_version": 3,
-
+  "manifest_version": 2,
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{70bd260b-d7d6-4cbb-ba2d-eb18968c33c0}",
+      "strict_min_version": "109.0"
+    }
+  },
   "name": "SignatureSync: Pro Signatures",
   "short_name": "SignatureSync",
   "description": "Simplify your messaging with SignatureSync, the tool that automates your signatures, ensuring a professional touch every time.",
@@ -11,7 +16,7 @@
     "48": "icons/light/icon48.png",
     "128": "icons/light/icon128.png"
   },
-  "action": {
+  "browser_action": {
     "default_icon"  : {
       "16": "icons/light/icon16.png",
       "32": "icons/light/icon32.png",
@@ -22,9 +27,7 @@
     "default_popup" : "popup/index.html"
   },
   "permissions": [
-    "storage"
-  ],
-  "host_permissions": [
+    "storage",
     "*://*.linkedin.com/"
   ],
   "content_scripts": [
@@ -34,12 +37,7 @@
     }
   ],
   "background": {
-    "service_worker": "service_worker.js"
+    "scripts": ["service_worker.js"]
   },
-  "web_accessible_resources": [
-    {
-      "resources": ["icons/*/icon32.png"],
-      "matches": ["*://*.linkedin.com/*"]
-    }
-  ]
+  "web_accessible_resources": ["icons/*/icon32.png"]
 }
