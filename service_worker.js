@@ -52,6 +52,8 @@ chrome.runtime.onInstalled.addListener(installInfo => {
         );
         chrome.runtime.setUninstallURL(`https://pratyushvashisht.com/signaturesync/uninstall?utm_source=browser&utm_medium=extension&utm_campaign=uninstall&debugData=${encodedDebugData}`);
 
+        const previousSignature = await browser.storage.local.get("linkedinsignature");
+        if (previousSignature.linkedinsignature) return;
         await browser.storage.local.set({ linkedinsignature: defaultSignature });
     });
 });
