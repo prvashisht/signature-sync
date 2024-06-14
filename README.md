@@ -2,14 +2,18 @@
 
 [![Version](https://img.shields.io/badge/Version-4.0.3-blue.svg)]() [![Release Workflow](https://github.com/prvashisht/signature-sync/actions/workflows/release-extension.yaml/badge.svg?branch=main)](https://github.com/prvashisht/signature-sync/actions/workflows/release-extension.yaml)
 
-SignatureSync is an open-source browser extension designed to enhance your professional messaging experience. Say goodbye to repetitive typing and hello to effortless conversations. SignatureSync allows you to set your signatures once, automatically appending them to your messages, ensuring a polished and professional touch.
+SignatureSync is an open-source browser extension designed to enhance your professional messaging experience. Say goodbye to repetitive typing and hello to effortless conversations. SignatureSync allows you to set your signatures once and automatically appends them to your messages, ensuring a polished and professional touch.
 
 ## Features
 
 - **Effortless Signatures:** Set your signatures once, and they will automatically append to your messages. Now, it also works on the note you add while sending someone a request to connect
 - **Total Control:** Enable or disable signatures with a click, adapting your signature presence to match your conversation's tone.
-- **Dark Mode support:** The icon changes color based on your theme for easier visibility.
-- **Flexible Customization:** Edit your signatures directly from the extension, ensuring they are always up-to-date.
+- **Separate messages and connection notes**: From version 4.0.0 onwards, you can set a separate message or signature for connection notes.
+- **Profile Variables**: While add a note for a connection request, you can add the following variables, which will be updated automatically:
+  - `__name__`, `__firstName__`, `__lastName__`: replaces with the full, first, and last names, respectively, of the profile the connection request is being to.
+  - `__company__`: The current company of the person, works correctly always on the profile page, less reliable on the search results or other pages.
+- **Dark Mode support:** The icon changes colour based on your theme for easier visibility.
+- **Flexible Customization:** Edit your signatures directly from the extension or toggle them from the message box itself.
 
 ## Installation
 
@@ -24,7 +28,7 @@ SignatureSync is now installed and ready for development. To develop the extensi
 
 ### Production Installation
 
-SignatureSync is available for production use through the Chrome Web Store. To install the extension for everyday use, visit [pratyushvashisht.com/signaturesync](https://pratyushvashisht.com/signaturesync) and follow the instructions to add SignatureSync to your Chrome browser.
+SignatureSync is available for production use through the Chrome Web Store. To install the extension for everyday use, visit [pratyushvashisht.com/signaturesync](https://pratyushvashisht.com/signaturesync?utm_medium=github&utm_name=readme) and follow the instructions to add SignatureSync to your Chrome browser.
 
 ## Usage
 
