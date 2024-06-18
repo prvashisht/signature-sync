@@ -8,8 +8,7 @@ class Popup {
     this.enableSignBox = document.getElementById('enableSign');
     this.editButton = document.getElementById('editSignature');
     this.saveButton = document.getElementById('saveSignature');
-    this.messagesTab = document.getElementById('messagesTab');
-    this.connectionsTab = document.getElementById('connectionsTab');
+    this.tabButtons = document.querySelectorAll('.tablinks');
 
     this.defaultSignature = {
       messageSignEnabled: true,
@@ -39,8 +38,7 @@ class Popup {
     this.enableSignBox.addEventListener('change', () => this.updateSaveButtonState());
     this.editButton.addEventListener('click', () => this.toggleEditState());
     this.saveButton.addEventListener('click', () => this.saveSignature());
-    this.messagesTab.addEventListener('click', () => this.setTab('messages'));
-    this.connectionsTab.addEventListener('click', () => this.setTab('connections'));
+    this.tabButtons.forEach(tabButton => tabButton.addEventListener('click', e => this.setTab(e.target.getAttribute('data-tab'))));
   }
 
   migrateStoredSignature(storedSignature) {
@@ -108,8 +106,7 @@ class Popup {
     
     if (isEditing) this.signatureText.focus();
 
-    this.messagesTab.classList.toggle('active', currentTab === 'messages');
-    this.connectionsTab.classList.toggle('active', currentTab === 'connections');
+    this.tabButtons.forEach(tabButton => tabButton.classList.toggle('active', tabButton.getAttribute('data-tab') === currentTab));
     this.enableSignBox.nextElementSibling.textContent = currentTab === 'messages' ? "Use in messages" : "Use in connection requests";
   }
 }
