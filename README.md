@@ -9,11 +9,11 @@ SignatureSync is an open-source browser extension designed to enhance your profe
 - **Effortless Signatures:** Set your signatures once, and they will automatically append to your messages. Now, it also works on the note you add while sending someone a request to connect
 - **Total Control:** Enable or disable signatures with a click, adapting your signature presence to match your conversation's tone.
 - **Separate messages and connection notes**: From version 4.0.0 onwards, you can set a separate message or signature for connection notes.
-- **Profile Variables**: While add a note for a connection request, you can add the following variables, which will be updated automatically:
+- **Profile Variables**: While adding a note for a connection request, you can add the following variables, which will be updated automatically:
   - `__name__`, `__firstName__`, `__lastName__`: replaces with the full, first, and last names, respectively, of the profile the connection request is being to.
-  - `__company__`: The current company of the person, works correctly always on the profile page, less reliable on the search results or other pages.
+  - `__company__`: The current company of the person works correctly always on the profile page but is less reliable on the search results or other pages.
 - **Dark Mode support:** The icon changes colour based on your theme for easier visibility.
-- **Flexible Customization:** Edit your signatures directly from the extension or toggle them from the message box itself.
+- **Flexible Customization:** You can Edit your signatures directly from the extension or toggle them from the message box itself.
 
 ## Installation
 
@@ -28,7 +28,7 @@ SignatureSync is now installed and ready for development. To develop the extensi
 
 ### Production Installation
 
-SignatureSync is available for production use through the Chrome Web Store. To install the extension for everyday use, visit [pratyushvashisht.com/signaturesync](https://pratyushvashisht.com/signaturesync?utm_medium=github&utm_name=readme) and follow the instructions to add SignatureSync to your Chrome browser.
+SignatureSync is available for production use through the Chrome Web Store. To install the extension for everyday use, visit [https://vashis.ht/signaturesync](https://vashis.ht/signaturesync?from=github-readme) and follow the instructions to add SignatureSync to your Chrome browser.
 
 ## Usage
 
