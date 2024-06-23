@@ -28,7 +28,7 @@ SignatureSync is now installed and ready for development. To develop the extensi
 
 ### Production Installation
 
-SignatureSync is available for production use through the Chrome Web Store. To install the extension for everyday use, visit [https://vashis.ht/signaturesync](https://vashis.ht/signaturesync?from=github-readme) and follow the instructions to add SignatureSync to your Chrome browser.
+SignatureSync is available for production use through the Chrome Web Store. To install the extension for everyday use, visit [https://vashis.ht/rd/signaturesync](https://vashis.ht/rd/signaturesync?from=github-readme) and follow the instructions to add SignatureSync to your Chrome browser.
 
 ## Usage
 
